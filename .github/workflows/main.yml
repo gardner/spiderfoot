@@ -14,5 +14,7 @@ jobs:
     - name: sync fork
       run: |
         git remote add upstream https://github.com/smicallef/spiderfoot.git
-        git pull upstream master
+        git fetch upstream
+        git merge -Xtheirs origin/upstream
         git push origin master
+
