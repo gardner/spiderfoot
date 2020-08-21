@@ -9,12 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: sync fork
-      run: |
-        git remote add upstream https://github.com/smicallef/spiderfoot.git
-        git fetch upstream
-        git merge -Xtheirs origin/upstream
-        git push origin master
+      - uses: TG908/fork-sync@v1.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: smicallef
+          base: master
+          head: master
 
