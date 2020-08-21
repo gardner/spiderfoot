@@ -3,6 +3,8 @@ name: Sync Upstream
 on:
   schedule:
     - cron:  '23 23 * * *'
+  watch:
+    types: [started]
 
 jobs:
   build:
