@@ -19,6 +19,31 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_virustotal(SpiderFootPlugin):
     """VirusTotal:Investigate,Passive:Reputation Systems:apikey:Obtain information from VirusTotal about identified IP addresses."""
 
+    meta = {
+        'name': "VirusTotal",
+        'summary': "Obtain information from VirusTotal about identified IP addresses.",
+        'flags': [ "apikey" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://www.virustotal.com/",
+            'model': "FREE_AUTH_LIMITED",
+            'references': [
+                "https://developers.virustotal.com/v3.0/reference"
+            ],
+            'apiKeyInstructions': [
+                "Visit www.virustotal.com/",
+                "Register a free account",
+                "Click on your profile",
+                "Click on API Key",
+                "The API key is listed under 'API Key'"
+            ],
+            'favIcon': "https://www.virustotal.com/gui/images/favicon.png",
+            'logo': "https://www.virustotal.com/gui/images/logo.svg",
+            'description': "Analyze suspicious files and URLs to detect types of malware, "
+                                "automatically share them with the security community.",
+        }
+    }
 
     # Default options
     opts = {

@@ -59,7 +59,44 @@ malchecks = {
 
 class sfp_abusech(SpiderFootPlugin):
     """abuse.ch:Investigate,Passive:Reputation Systems::Check if a host/domain, IP or netblock is malicious according to abuse.ch."""
-
+    
+    meta = {
+        'name': "abuse.ch",
+        'summary': "Check if a host/domain, IP or netblock is malicious according to abuse.ch.",
+        'flags': [],
+        'useCases': [ "Passive", "Investigate" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://www.abuse.ch",
+            'model': "FREE_AUTH_UNLIMITED",
+            'references': [
+                "https://bazaar.abuse.ch/",
+                "https://feodotracker.abuse.ch/",
+                "https://igotphished.abuse.ch/",
+                "https://sslbl.abuse.ch/",
+                "https://urlhaus.abuse.ch/"
+            ],
+            'apiKeyInstructions': [
+                "Visit https://bazaar.abuse.ch/api#api_key",
+                "Login using a Twitter Account",
+                "Navigate to 'Account Settings'",
+                "The API key is listed under 'Your API Key'",
+                "Visit https://igotphished.abuse.ch/api/",
+                "Request an API key from the email listed under 'Submit data to I Got Phished'",
+                "Visit urlhaus.abuse.ch/api/",
+                "Login using a Twitter Account at urlhaus.abuse.ch/login/",
+                "Navigate to urlhaus.abuse.ch/api/#account",
+                "The API Key is listed under 'API-Key'"
+            ],
+            'favIcon': "https://abuse.ch/favicon.ico",
+            'logo': "https://abuse.ch/images/abusech.svg",
+            'description': "abuse.ch is operated by a random swiss guy fighting malware for non-profit, "
+                                "running a couple of projects helping internet service providers and "
+                                "network operators protecting their infrastructure from malware.\n"
+                                "IT-Security researchers, vendors and law enforcement agencies rely on data from abuse.ch,"
+                                "trying to make the internet a safer place.",
+        }
+    }
 
     # Default options
     opts = {
@@ -280,45 +317,45 @@ class sfp_abusech(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+               typeId = 'ip'
+               if eventName == 'IP_ADDRESS':
+                   evtType = 'MALICIOUS_IPADDR'
+               else:
+                   evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                if eventName == 'NETBLOCK_OWNER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_NETBLOCK'
-                if eventName == 'NETBLOCK_MEMBER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_SUBNET'
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                   evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                   evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                   evtType = 'MALICIOUS_COHOST'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName == 'NETBLOCK_OWNER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_NETBLOCK'
+            if eventName == 'NETBLOCK_MEMBER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_SUBNET'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

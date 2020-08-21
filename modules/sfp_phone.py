@@ -20,10 +20,19 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_phone(SpiderFootPlugin):
     """Phone Number Extractor:Passive,Footprint,Investigate:Content Analysis::Identify phone numbers in scraped webpages."""
 
+    meta = {
+        'name': "Phone Number Extractor",
+        'summary': "Identify phone numbers in scraped webpages.",
+        'flags': [ "" ],
+        'useCases': [ "Passive", "Footprint", "Investigate" ],
+        'categories': [ "Content Analysis" ]
+    }
+
     # Default options
     opts = {}
 
     results = None
+    optdescs = {}
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
@@ -85,6 +94,10 @@ class sfp_phone(SpiderFootPlugin):
 
             if number_carrier:
                 evt = SpiderFootEvent("PROVIDER_TELCO", number_carrier, self.__name__, event)
+                if event.moduleDataSource:
+                    evt.moduleDataSource = event.moduleDataSource
+                else:
+                    evt.moduleDataSource = "Unknown"
                 self.notifyListeners(evt)
             else:
                 self.sf.debug("No carrier information found for " + eventData)

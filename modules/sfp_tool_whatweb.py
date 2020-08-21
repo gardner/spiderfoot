@@ -20,6 +20,24 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_tool_whatweb(SpiderFootPlugin):
     """Tool - WhatWeb:Footprint,Investigate:Content Analysis:tool:Identify what software is in use on the specified website."""
 
+    meta = {
+        'name': "Tool - WhatWeb",
+        'summary': "Identify what software is in use on the specified website.",
+        'flags': [ "tool" ],
+        'useCases': [ "Footprint", "Investigate" ],
+        'categories': [ "Content Analysis" ],
+        'toolDetails': {
+            'name': "WhatWeb",
+            'description': "WhatWeb identifies websites. Its goal is to answer the question, \"What is that Website?\". "
+                                "WhatWeb recognises web technologies including content management systems (CMS), "
+                                "blogging platforms, statistic/analytics packages, JavaScript libraries, web servers, and embedded devices. "
+                                "WhatWeb has over 1800 plugins, each to recognise something different. "
+                                "WhatWeb also identifies version numbers, email addresses, account IDs, web framework modules, SQL errors, and more.",
+            'website': 'https://github.com/urbanadventurer/whatweb',
+            'repository': 'https://github.com/urbanadventurer/whatweb'
+        },
+    }
+
     # Default options
     opts = {
         'aggression': 1,
@@ -129,6 +147,9 @@ class sfp_tool_whatweb(SpiderFootPlugin):
             result_json = json.loads(stdout)
         except BaseException as e:
             self.sf.error("Couldn't parse the JSON output of WhatWeb: " + str(e), False)
+            return None
+
+        if len(result_json) == 0:
             return None
 
         evt = SpiderFootEvent('RAW_RIR_DATA', str(result_json), self.__name__, event)

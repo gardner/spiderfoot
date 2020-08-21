@@ -17,6 +17,26 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_psbdmp(SpiderFootPlugin):
     """Psbdmp:Footprint,Investigate,Passive:Leaks, Dumps and Breaches::Check psbdmp.cc (PasteBin Dump) for potentially hacked e-mails and domains."""
 
+    meta = {
+        'name': "Psbdmp",
+        'summary': "Check psbdmp.cc (PasteBin Dump) for potentially hacked e-mails and domains.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint", "Investigate", "Passive" ],
+        'categories': [ "Leaks, Dumps and Breaches" ],
+        'dataSource': {
+            'website': "https://psbdmp.cc/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://psbdmp.cc/"
+            ],
+            'favIcon': "",
+            'logo': "",
+            'description': "Search dump(s) by some word.\n"
+                                "Search dump(s) by email.\n"
+                                "Search dump(s) by domain.\n"
+                                "Search dump(s) from specific date.",
+        }
+    }
 
     # Default options
     opts = {
@@ -78,7 +98,7 @@ class sfp_psbdmp(SpiderFootPlugin):
         if 'count' in ret:
             if ret['count'] > 0:
                 for d in ret['data']:
-                    ids.append("https://psbdmp.cc/" + d['id'])
+                    ids.append("https://pastebin.com/" + d['id'])
             else:
                 return None
         else:

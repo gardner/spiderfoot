@@ -49,6 +49,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class SpiderFoot:
+    """SpiderFoot
+
+    Attributes:
+        dbh: TBD
+        GUID: TBD
+        savedSock: TBD
+        socksProxy: TBD
+    """
+ 
     dbh = None
     GUID = None
     savedsock = socket
@@ -62,9 +71,6 @@ class SpiderFoot:
             handle (str): a handle to something. will be supplied if the module
             is being used within the SpiderFoot GUI, in which case all feedback
             should be fed back
-
-        Returns:
-            None
         """
 
         self.handle = handle
@@ -72,8 +78,7 @@ class SpiderFoot:
 
         # This is ugly but we don't want any fetches to fail - we expect
         # to encounter unverified SSL certs!
-        if sys.version_info >= (2, 7, 9):
-            ssl._create_default_https_context = ssl._create_unverified_context
+        ssl._create_default_https_context = ssl._create_unverified_context
 
         if self.opts.get('_dnsserver', "") != "":
             res = dns.resolver.Resolver()
@@ -376,11 +381,6 @@ class SpiderFoot:
             str: scan instance unique GUID
         """
 
-        # hashStr = hashlib.sha256(
-        #     scanName +
-        #     str(time.time() * 1000) +
-        #     str(random.SystemRandom().randint(100000, 999999))
-        # ).hexdigest()
         return str(uuid.uuid4()).split("-")[0].upper()
 
     def _dblog(self, level, message, component=None):
@@ -394,8 +394,6 @@ class SpiderFoot:
         Returns:
             bool: scan event logged successfully
         """
-
-        #print(str(self.GUID) + ":" + str(level) + ":" + str(message) + ":" + str(component))
 
         if not self.dbh:
             self.error("No database handle. Could not log event to database: %s" % message, True)
@@ -574,10 +572,6 @@ class SpiderFoot:
             s = str(string)
         return hashlib.sha256(s.encode('raw_unicode_escape')).hexdigest()
 
-    #
-    # Caching
-    #
-
     def cachePath(self):
         """Returns the file system location of the cacha data files.
 
@@ -590,8 +584,14 @@ class SpiderFoot:
             os.mkdir(path)
         return path
 
-    # Store data to the cache
     def cachePut(self, label, data):
+        """Store data to the cache
+
+        Args:
+            label (str): TBD
+            data (str): TBD
+        """
+
         pathLabel = hashlib.sha224(label.encode('utf-8')).hexdigest()
         cacheFile = self.cachePath() + "/" + pathLabel
         with io.open(cacheFile, "w", encoding="utf-8", errors="ignore") as fp:
@@ -607,8 +607,17 @@ class SpiderFoot:
             else:
                 fp.write(data)
 
-    # Retreive data from the cache
     def cacheGet(self, label, timeoutHrs):
+        """Retreive data from the cache
+
+        Args:
+            label (str): TBD
+            timeoutHrs (str): TBD
+
+        Returns:
+            str: cached data
+        """
+
         if label is None:
             return None
 
@@ -626,12 +635,8 @@ class SpiderFoot:
                 return fileContents
             else:
                 return None
-        except BaseException as e:
+        except BaseException:
             return None
-
-    #
-    # Configuration process
-    #
 
     def configSerialize(self, opts, filterSystem=True):
         """Convert a Python dictionary to something storable in the database.
@@ -911,10 +916,6 @@ class SpiderFoot:
 
         return evtlist
 
-    #
-    # URL parsing functions
-    #
-
     def urlRelativeToAbsolute(self, url):
         """Turn a relative path into an absolute path
 
@@ -951,7 +952,6 @@ class SpiderFoot:
 
             finalBits.append(chunk)
 
-        #self.debug('xfrmed rel to abs path: ' + url + ' to ' + '/'.join(finalBits))
         return '/'.join(finalBits)
 
     def urlBaseDir(self, url):
@@ -972,16 +972,14 @@ class SpiderFoot:
 
         # For cases like 'www.somesite.com'
         if len(bits) == 0:
-            #self.debug('base dir of ' + url + ' not identified, using URL as base.')
             return url + '/'
 
         # For cases like 'http://www.blah.com'
         if '://' in url and url.count('/') < 3:
-            #self.debug('base dir of ' + url + ' is: ' + url + '/')
             return url + '/'
 
         base = '/'.join(bits[:-1])
-        #self.debug('base dir of ' + url + ' is: ' + base + '/')
+
         return base + '/'
 
     def urlBaseUrl(self, url):
@@ -1008,7 +1006,6 @@ class SpiderFoot:
         if bits is None:
             return url.lower()
 
-        #self.debug('base url of ' + url + ' is: ' + bits.group(1))
         return bits.group(1).lower()
 
     def urlFQDN(self, url):
@@ -1053,6 +1050,7 @@ class SpiderFoot:
         dom = self.hostDomain(domain.lower(), tldList)
         if not dom:
             return None
+
         tld = '.'.join(dom.split('.')[1:])
         ret = domain.lower().replace('.' + tld, '')
 
@@ -1197,7 +1195,7 @@ class SpiderFoot:
                 return True
             else:
                 return False
-        except:
+        except BaseException:
             return False
 
     def normalizeDNS(self, res):
@@ -1234,7 +1232,7 @@ class SpiderFoot:
             email (str): The email address to check.
 
         Returns:
-            bool
+            bool: email is a valid email address
         """
 
         if not isinstance(email, str):
@@ -1243,11 +1241,9 @@ class SpiderFoot:
         if "@" not in email:
             return False
 
-        # Basic regex check
         if not re.match(r'^([\%a-zA-Z\.0-9_\-\+]+@[a-zA-Z\.0-9\-]+\.[a-zA-Z\.0-9\-]+)$', email):
             return False
 
-        # Handle false positive matches
         if len(email) < 5:
             return False
 
@@ -1268,7 +1264,7 @@ class SpiderFoot:
             cmd (str): The command to check
 
         Returns:
-            bool
+            bool: command is "safe"
         """
 
         chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -1357,7 +1353,6 @@ class SpiderFoot:
             return {}
 
         def get_children(needle, haystack):
-            #print("called")
             ret = list()
 
             if needle not in list(haystack.keys()):
@@ -1367,7 +1362,6 @@ class SpiderFoot:
                 return None
 
             for c in haystack[needle]:
-                #print("found child of " + needle + ": " + c)
                 ret.append({"name": c, "children": get_children(c, haystack)})
             return ret
 
@@ -1390,16 +1384,9 @@ class SpiderFoot:
                 break
 
         if root is None:
-            #print("*BUG*: Invalid structure - needs to go back to one root.")
-            final = {}
-        else:
-            final = {"name": root, "children": get_children(root, data)}
+            return {}
 
-        return final
-
-    #
-    # General helper functions to automate many common tasks between modules
-    #
+        return {"name": root, "children": get_children(root, data)}
 
     def resolveHost(self, host):
         """Return a normalised resolution of a hostname.
@@ -1408,7 +1395,7 @@ class SpiderFoot:
             host (str): host to resolve
 
         Returns:
-            list
+            list: IP addresses
         """
 
         addrs = list()
@@ -1570,6 +1557,11 @@ class SpiderFoot:
 
         Returns:
             list: list of patterns which should not be followed
+
+        Todo:
+            We don't check the User-Agent rule yet.. probably should at some stage
+
+            fix whitespace parsing; ie, " " is not a valid disallowed path
         """
 
         returnArr = list()
@@ -1577,11 +1569,8 @@ class SpiderFoot:
         if not isinstance(robotsTxtData, str):
             return returnArr
 
-        # We don't check the User-Agent rule yet.. probably should at some stage
-
         for line in robotsTxtData.splitlines():
             if line.lower().startswith('disallow:'):
-                # todo: fix whitespace parsing; ie, " " is not a valid disallowed path
                 m = re.match(r'disallow:\s*(.[^ #]*)', line, re.IGNORECASE)
                 if m:
                     self.debug('robots.txt parsing found disallow: ' + m.group(1))
@@ -1757,13 +1746,11 @@ class SpiderFoot:
             countryCode = iban[0:2]
 
             if countryCode not in ibanCountryLengths.keys():
-                # Invalid IBAN due to country code not existing in dictionary
-                self.debug("Skipped invalid IBAN: %s" % iban)
+                self.debug("Skipped invalid IBAN (invalid country code): %s" % iban)
                 continue
             
             if len(iban) != ibanCountryLengths[countryCode]:
-                # Invalid IBAN due to length mismatch
-                self.debug("Skipped invalid IBAN: %s" % iban)
+                self.debug("Skipped invalid IBAN (invalid length): %s" % iban)
                 continue
 
             # Convert IBAN to integer format.
@@ -1776,7 +1763,6 @@ class SpiderFoot:
 
             # Check IBAN integer mod 97 for remainder
             if int(iban_int) % 97 != 1:
-                # Invalid IBAN due to failed Mod 97 operation
                 self.debug("Skipped invalid IBAN: %s" % iban)
                 continue
 
@@ -1923,14 +1909,23 @@ class SpiderFoot:
         # https://tools.ietf.org/html/rfc3986#section-3.3
         return re.findall(r"(https?://[a-zA-Z0-9-\.:]+/[\-\._~!\$&'\(\)\*\+\,\;=:@/a-zA-Z0-9]*)", html.unescape(content))
 
-    # Find all URLs within the supplied content. This does not fetch any URLs!
-    # A dictionary will be returned, where each link will have the keys
-    # 'source': The URL where the link was obtained from
-    # 'original': What the link looked like in the content it was obtained from
-    # The key will be the *absolute* URL of the link obtained, so for example if
-    # the link '/abc' was obtained from 'http://xyz.com', the key in the dict will
-    # be 'http://xyz.com/abc' with the 'original' attribute set to '/abc'
     def parseLinks(self, url, data, domains):
+        """Find all URLs within the supplied content.
+
+        This does not fetch any URLs!
+        A dictionary will be returned, where each link will have the keys
+        'source': The URL where the link was obtained from
+        'original': What the link looked like in the content it was obtained from
+        The key will be the *absolute* URL of the link obtained, so for example if
+        the link '/abc' was obtained from 'http://xyz.com', the key in the dict will
+        be 'http://xyz.com/abc' with the 'original' attribute set to '/abc'
+
+        Args:
+            url (str): TBD
+            data: TBD
+            domains: TBD
+        """
+
         returnLinks = dict()
 
         if data is None or len(data) == 0:
@@ -1941,18 +1936,18 @@ class SpiderFoot:
             domains = [domains]
 
         tags = {
-                    'a': 'href',
-                    'img': 'src',
-                    'script': 'src',
-                    'link': 'href',
-                    'area': 'href',
-                    'base': 'href',
-                    'form': 'action'
+            'a': 'href',
+            'img': 'src',
+            'script': 'src',
+            'link': 'href',
+            'area': 'href',
+            'base': 'href',
+            'form': 'action'
         }
 
         try:
             proto = url.split(":")[0]
-        except BaseException as e:
+        except BaseException:
             proto = "http"
         if proto == None:
             proto = "http"
@@ -2071,7 +2066,6 @@ class SpiderFoot:
         }
 
         if url is None:
-            #self.debug("fetchUrl: No url")
             return None
 
         url = url.strip()
@@ -2136,6 +2130,7 @@ class SpiderFoot:
                                     verify=verify, timeout=timeout)
                 size = int(hdr.headers.get('content-length', 0))
                 newloc = hdr.headers.get('location', url).strip()
+
                 # Relative re-direct
                 if newloc.startswith("/") or newloc.startswith("../"):
                     newloc = self.urlBaseUrl(url) + newloc
@@ -2162,20 +2157,16 @@ class SpiderFoot:
 
                     if size > sizeLimit:
                         return result
-            if cookies is not None:
-                #req.add_header('cookie', cookies)
-                if not noLog:
+
+            if not noLog:
+                if cookies is None:
+                    self.info("Fetching: " + self.removeUrlCreds(url) + " [user-agent: " + \
+                          header['User-Agent'] + "] [timeout: " + str(timeout) + "]")
+                else:
                     self.info("Fetching (incl. cookies): " + self.removeUrlCreds(url) + \
                           " [user-agent: " + header['User-Agent'] + "] [timeout: " + \
                           str(timeout) + "]")
-            else:
-                if not noLog:
-                    self.info("Fetching: " + self.removeUrlCreds(url) + " [user-agent: " + \
-                          header['User-Agent'] + "] [timeout: " + str(timeout) + "]")
 
-            #
-            # MAKE THE REQUEST
-            #
             try:
                 if postData:
                     res = self.getSession().post(url, data=postData, headers=header, proxies=proxies,
@@ -2251,10 +2242,14 @@ class SpiderFoot:
                   " (" + self.removeUrlCreds(url) + "), took " + t + "s")
         return result
 
-    # Check if wildcard DNS is enabled by looking up a random hostname
     def checkDnsWildcard(self, target):
+        """Check if wildcard DNS is enabled by looking up a random hostname
+
+        Args:
+            target (str): TBD
+        """
+
         if not target:
-            #self.debug("checkDnsWildcard: No target")
             return False
 
         randpool = 'bcdfghjklmnpqrstvwxyz3456789'
@@ -2265,15 +2260,24 @@ class SpiderFoot:
 
         return True
 
-    # Request search results from the Google API. Will return a dict:
-    # {
-    #   "urls": a list of urls that match the query string,
-    #   "webSearchUrl": url for Google results page,
-    # }
-    # Options accepted:
-    # useragent: User-Agent string to use
-    # timeout: API call timeout
     def googleIterate(self, searchString, opts=dict()):
+        """Request search results from the Google API.
+
+        Will return a dict:
+        {
+          "urls": a list of urls that match the query string,
+          "webSearchUrl": url for Google results page,
+        }
+
+        Options accepted:
+            useragent: User-Agent string to use
+            timeout: API call timeout
+
+        Args:
+            searchString (str) :TBD
+            opts (dict): TBD
+        """
+
         endpoint = "https://www.googleapis.com/customsearch/v1?q={search_string}&".format(
             search_string=searchString.replace(" ", "%20")
         )
@@ -2297,39 +2301,48 @@ class SpiderFoot:
             self.error("the key 'content' in the Google API response doesn't contain valid json.", exception=False)
             return None
 
-        if "items" in response_json:
-            # We attempt to make the URL look as authentically human as possible
-            params = {
-                "ie": "utf-8",
-                "oe": "utf-8",
-                "aq": "t",
-                "rls": "org.mozilla:en-US:official",
-                "client": "firefox-a",
-            }
-            search_url = "https://www.google.com/search?q={search_string}&{params}".format(
-                search_string=searchString.replace(" ", "%20"),
-                params=urllib.parse.urlencode(params)
-            )
-            results = {
-                "urls": [str(k['link']) for k in response_json['items']],
-                "webSearchUrl": search_url,
-            }
-        else:
+        if "items" not in response_json:
             return None
+
+        # We attempt to make the URL look as authentically human as possible
+        params = {
+            "ie": "utf-8",
+            "oe": "utf-8",
+            "aq": "t",
+            "rls": "org.mozilla:en-US:official",
+            "client": "firefox-a",
+        }
+        search_url = "https://www.google.com/search?q={search_string}&{params}".format(
+            search_string=searchString.replace(" ", "%20"),
+            params=urllib.parse.urlencode(params)
+        )
+        results = {
+            "urls": [str(k['link']) for k in response_json['items']],
+            "webSearchUrl": search_url,
+        }
 
         return results
 
-
-    # Request search results from the Bing API. Will return a dict:
-    # {
-    #   "urls": a list of urls that match the query string,
-    #   "webSearchUrl": url for bing results page,
-    # }
-    # Options accepted:
-    # count: number of search results to request from the API
-    # useragent: User-Agent string to use
-    # timeout: API call timeout
     def bingIterate(self, searchString, opts=dict()):
+        """Request search results from the Bing API.
+
+        Will return a dict:
+        {
+          "urls": a list of urls that match the query string,
+          "webSearchUrl": url for bing results page,
+        }
+
+        Options accepted:
+            count: number of search results to request from the API
+            useragent: User-Agent string to use
+            timeout: API call timeout
+
+        Args:
+            searchString (str): TBD
+            opts (dict): TBD
+
+        """
+
         endpoint = "https://api.cognitive.microsoft.com/bing/v7.0/search?q={search_string}&".format(
             search_string=searchString.replace(" ", "%20")
         )
@@ -2371,9 +2384,24 @@ class SpiderFoot:
         return results
 
 
-# SpiderFoot plug-in module base class
-#
 class SpiderFootPlugin(object):
+    """SpiderFootPlugin module object
+
+    Attributes:
+        _stopScanning (bool): Will be set to True by the controller if the user aborts scanning
+        listenerModules (list): Modules that will be notified when this module produces events
+        _currentEvent (SpiderFootEvent): Current event being processed
+        _currentTarget (str): Target currently being acted against
+        _name_: Name of this module, set at startup time
+        __sfdb__: Direct handle to the database - not to be directly used
+                  by modules except the sfp__stor_db module.
+        __scanId__: ID of the scan the module is running against
+        __datasource__: (Unused) tracking of data sources
+        __outputFilter: If set, events not matching this list are dropped
+        _priority (int): Priority, smaller numbers should run first
+        errorState (bool): error state of the module
+    """
+
     # Will be set to True by the controller if the user aborts scanning
     _stopScanning = False
     # Modules that will be notified when this module produces events
@@ -2494,7 +2522,7 @@ class SpiderFootPlugin(object):
             Move all module state to use this, which then would enable a scan to be paused/resumed.
 
         Note:
-            Required for SpiderFoot HX compatability of modules.
+            Required for SpiderFoot HX compatibility of modules.
 
         Returns:
             dict: module temporary state data
@@ -2525,7 +2553,6 @@ class SpiderFootPlugin(object):
         storeOnly = False  # Under some conditions, only store and don't notify
 
         if sfEvent.data is None or (type(sfEvent.data) is str and len(sfEvent.data) == 0):
-            #print("No data to send for " + eventName + " to " + listener.__module__)
             return None
 
         if self.checkForStop():
@@ -2550,7 +2577,6 @@ class SpiderFootPlugin(object):
             if prevEvent.sourceEvent is not None:
                 if prevEvent.sourceEvent.eventType == sfEvent.eventType and \
                                 prevEvent.sourceEvent.data.lower() == sfEvent.data.lower():
-                    #print("Skipping notification of " + sfEvent.eventType + " / " + sfEvent.data)
                     storeOnly = True
                     break
             prevEvent = prevEvent.sourceEvent
@@ -2558,16 +2584,12 @@ class SpiderFootPlugin(object):
         self._listenerModules.sort(key=lambda m: m._priority)
 
         for listener in self._listenerModules:
-            #print(listener.__module__ + ": " + listener.watchedEvents().__str__())
             if eventName not in listener.watchedEvents() and '*' not in listener.watchedEvents():
-                #print(listener.__module__ + " not listening for " + eventName)
                 continue
 
             if storeOnly and "__stor" not in listener.__module__:
-                #print("Storing only for " + sfEvent.eventType + " / " + sfEvent.data)
                 continue
 
-            #print("Notifying " + eventName + " to " + listener.__module__)
             listener._currentEvent = sfEvent
 
             # Check if we've been asked to stop in the meantime, so that
@@ -2575,7 +2597,6 @@ class SpiderFootPlugin(object):
             if self.checkForStop():
                 return None
 
-            #print("EVENT: " + str(sfEvent))
             try:
                 if type(sfEvent.data) == bytes:
                     sfEvent.data = sfEvent.data.decode('utf-8', 'ignore')
@@ -2658,7 +2679,14 @@ class SpiderFootPlugin(object):
 
 
 class SpiderFootTarget(object):
-    """SpiderFoot target."""
+    """SpiderFoot target.
+
+    Attributes:
+        validTypes (list): valid event types accepted as a target
+        targetType (str): target type
+        targetValue (str): target value
+        targetAliases (list): target aliases
+    """
 
     _validTypes = ["IP_ADDRESS", 'IPV6_ADDRESS', "NETBLOCK_OWNER", "INTERNET_NAME",
                    "EMAILADDR", "HUMAN_NAME", "BGP_AS_OWNER", 'PHONE_NUMBER', "USERNAME"]
@@ -2673,41 +2701,42 @@ class SpiderFootTarget(object):
             targetValue (str): target value
             typeName (str): target type
 
-        Returns:
-            None
-
         Raises:
             TypeError: targetValue type was invalid
             ValueError: targetValue value was empty
             ValueError: typeName value was an invalid target type
         """
 
-        if not isinstance(targetValue, str):
-            raise TypeError("Invalid target value %s; expected %s" % type(targetValue))
-        if not targetValue:
-            raise ValueError("Specified target value is blank.")
-        if typeName not in self._validTypes:
-            raise ValueError("Invalid target type %s; expected %s" % (typeName, self._validTypes))
-
-        self._targetType = typeName
-        self._targetValue = targetValue
-        self._targetAliases = list()
+        self.targetType = typeName
+        self.targetValue = targetValue
+        self.targetAliases = list()
 
     @property
     def targetType(self):
         return self._targetType
 
     @targetType.setter
-    def targetType(self, value):
-        self._targetType = value
+    def targetType(self, targetType):
+        if not isinstance(targetType, str):
+            raise TypeError(f"targetType is {type(targetType)}; expected str()")
+ 
+        if targetType not in self._validTypes:
+            raise ValueError(f"targetType value is {targetType}; expected {self._validTypes}")
+
+        self._targetType = targetType
 
     @property
     def targetValue(self):
         return self._targetValue
 
     @targetValue.setter
-    def targetValue(self, value):
-        self._targetValue = value
+    def targetValue(self, targetValue):
+        if not isinstance(targetValue, str):
+            raise TypeError(f"targetValue is {type(targetValue)}; expected str()")
+        if not targetValue:
+            raise ValueError("targetValue value is blank")
+
+        self._targetValue = targetValue
 
     @property
     def targetAliases(self):
@@ -2857,76 +2886,278 @@ class SpiderFootTarget(object):
 
 
 class SpiderFootEvent(object):
-    """SpiderFoot event."""
+    """SpiderFootEvent object representing identified data and associated meta data.
 
-    generated = None
-    eventType = None
-    confidence = None
-    visibility = None
-    risk = None
-    module = None
-    data = None
-    sourceEvent = None
-    sourceEventHash = None
-    moduleDataSource = None
-    actualSource = None
+    Attributes:
+        generated (float): timestamp of event creation time
+        eventType (str): event type, e.g. URL_FORM, RAW_DATA, etc.
+        confidence (int): how sure are we of this data's validity, 0-100
+        visibility (int): how 'visible' was this data, 0-100
+        risk (int): how much risk does this data represent, 0-100
+        module (str): module from which the event originated
+        data (str): event data, e.g. a URL, port number, webpage content, etc.
+        sourceEvent (SpiderFootEvent): SpiderFootEvent that triggered this event
+        sourceEventHash (str): hash of the SpiderFootEvent event that triggered this event
+        hash (str): unique SHA256 hash of the event, or "ROOT"
+        moduleDataSource (str): module data source
+        actualSource (str): source data of parent event
+        __id: unique ID of the event, generated using eventType, generated, module, and a random integer
+    """
+
+    _generated = None
+    _eventType = None
+    _confidence = None
+    _visibility = None
+    _risk = None
+    _module = None
+    _data = None
+    _sourceEvent = None
+    _sourceEventHash = None
+    _moduleDataSource = None
+    _actualSource = None
     __id = None
 
-    def __init__(self, eventType, data, module, sourceEvent,
-                 confidence=100, visibility=100, risk=0):
-        """Initialize SpiderFoot event.
+    def __init__(self, eventType, data, module, sourceEvent, confidence=100, visibility=100, risk=0):
+        """Initialize SpiderFoot event object.
 
         Args:
-            eventType (str): event type
-            data (str): event data
+            eventType (str): event type, e.g. URL_FORM, RAW_DATA, etc.
+            data (str): event data, e.g. a URL, port number, webpage content, etc.
             module (str): module from which the event originated
-            sourceEvent (SpiderFootEvent): source event
-            confidence (int): event confidence
-            visibility (int): event visibility
-            risk (int): event risk
-
-        Returns:
-            dict: event as dict
+            sourceEvent (SpiderFootEvent): SpiderFootEvent event that triggered this event
+            confidence (int): how sure are we of this data's validity, 0-100
+            visibility (int): how 'visible' was this data, 0-100
+            risk (int): how much risk does this data represent, 0-100
 
         Raises:
             TypeError: arg type was invalid
+            ValueError: arg value was invalid
         """
 
+        self._generated = time.time()
+        self.data = data
         self.eventType = eventType
-        self.generated = time.time()
+        self.module = module
         self.confidence = confidence
         self.visibility = visibility
         self.risk = risk
-        self.module = module
         self.sourceEvent = sourceEvent
+        self.__id = f"{self.eventType}{self.generated}{self.module}{random.SystemRandom().randint(0, 99999999)}"
 
+    @property
+    def generated(self):
+        """
+        Returns:
+            float: timestamp of event creation time
+        """
+        return self._generated
+
+    @property
+    def eventType(self):
+        return self._eventType
+
+    @property
+    def confidence(self):
+        """
+        Returns:
+            int: How sure are we of this data's validity (0 to 100)
+        """
+        return self._confidence
+
+    @property
+    def visibility(self):
+        """
+        Returns:
+            int: How 'visible' was this data (0 to 100)
+        """
+        return self._visibility
+
+    @property
+    def risk(self):
+        """
+        Returns:
+            int: How much risk does this data represent (0 to 100)
+        """
+        return self._risk
+
+    @property
+    def module(self):
+        return self._module
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def sourceEvent(self):
+        return self._sourceEvent
+
+    @property
+    def sourceEventHash(self):
+        return self._sourceEventHash
+
+    @property
+    def actualSource(self):
+        """actual source"""
+        return self._actualSource
+
+    @property
+    def moduleDataSource(self):
+        """module data source"""
+        return self._moduleDataSource
+
+    @property
+    def hash(self):
+        """Unique hash of this event.
+
+        Returns:
+            str: unique SHA256 hash of the event, or "ROOT"
+        """
+        if self.eventType == "ROOT":
+            return "ROOT"
+
+        digestStr = self.__id.encode('raw_unicode_escape')
+        return hashlib.sha256(digestStr).hexdigest()
+
+    @eventType.setter
+    def eventType(self, eventType):
+        """
+        Args:
+            eventType (str): type of data for this event
+
+        Raises:
+            TypeError: confidence type was invalid
+            ValueError: confidence value was invalid
+        """
+ 
+        if not isinstance(eventType, str):
+            raise TypeError(f"eventType is {type(eventType)}; expected str()")
+
+        if not eventType:
+            raise ValueError("eventType is empty")
+
+        self._eventType = eventType
+
+    @confidence.setter
+    def confidence(self, confidence):
+        """
+        Args:
+            confidence (int): How sure are we of this data's validitya(0 to 100)
+
+        Raises:
+            TypeError: confidence type was invalid
+            ValueError: confidence value was invalid
+        """
+ 
+        if not isinstance(confidence, int):
+            raise TypeError(f"confidence is {type(confidence)}; expected int()")
+
+        if not 0 <= confidence <= 100:
+            raise ValueError(f"confidence value is {confidence}; expected 0 - 100")
+
+        self._confidence = confidence
+
+    @visibility.setter
+    def visibility(self, visibility):
+        """
+        Args:
+            visibility (int): How 'visible' was this data (0 to 100)
+
+        Raises:
+            TypeError: visibility type was invalid
+            ValueError: visibility value was invalid
+        """
+ 
+        if not isinstance(visibility, int):
+            raise TypeError(f"visibility is {type(visibility)}; expected int()")
+
+        if not 0 <= visibility <= 100:
+            raise ValueError(f"visibility value is {visibility}; expected 0 - 100")
+
+        self._visibility = visibility
+
+    @risk.setter
+    def risk(self, risk):
+        """
+        Args:
+            risk (int): How much risk does this data represent (0 to 100)
+
+        Raises:
+            TypeError: risk type was invalid
+            ValueError: risk value was invalid
+        """
+ 
+        if not isinstance(risk, int):
+            raise TypeError(f"risk is {type(risk)}; expected int()")
+
+        if not 0 <= risk <= 100:
+            raise ValueError(f"risk value is {risk}; expected 0 - 100")
+
+        self._risk = risk
+
+    @module.setter
+    def module(self, module):
+        """
+        Raises:
+            TypeError: module type was invalid
+            ValueError: module value was invalid
+        """
+ 
+        if not isinstance(module, str):
+            raise TypeError(f"module is {type(module )}; expected str()")
+
+        if not module:
+            if self.eventType != "ROOT":
+                raise ValueError("module is empty")
+
+        self._module = module
+
+    @data.setter
+    def data(self, data):
+        """
+        Raises:
+            TypeError: data type was invalid
+            ValueError: data value was invalid
+        """
+ 
         if not isinstance(data, str):
-            print("FATAL: Only string events are accepted, not '%s'." % type(data))
-            print("FATAL: Offending module: %s" % module)
-            print("FATAL: Offending type: %s" % eventType)
-            raise TypeError("data is %s; expected str()" % type(data))
+            raise TypeError(f"data is {type(data)}; expected str()")
 
-        self.data = data
+        if not data:
+            raise ValueError("data is empty")
 
-        # "ROOT" is a special "hash" reserved for elements with no
-        # actual parent (e.g. the first page spidered.)
-        if eventType == "ROOT":
-            self.sourceEventHash = "ROOT"
+        self._data = data
+
+    @sourceEvent.setter
+    def sourceEvent(self, sourceEvent):
+        """
+        Raises:
+            TypeError: sourceEvent type was invalid
+        """
+ 
+        # "ROOT" is a special "hash" reserved for elements with no parent,
+        # such as targets provided via the web UI or CLI.
+        if self.eventType == "ROOT":
+            self._sourceEvent = None
+            self._sourceEventHash = "ROOT"
             return
 
         if not isinstance(sourceEvent, SpiderFootEvent):
-            print("FATAL: Invalid source event: %s" % sourceEvent)
-            print("FATAL: Offending module: %s" % module)
-            print("FATAL: Offending type: %s" % eventType)
-            raise TypeError("sourceEvent is %s; expected SpiderFootEvent()" % type(sourceEvent))
+            raise TypeError(f"sourceEvent is {type(sourceEvent)}; expected SpiderFootEvent()")
 
-        self.sourceEventHash = sourceEvent.getHash()
-        self.__id = self.eventType + str(self.generated) + self.module + \
-                    str(random.SystemRandom().randint(0, 99999999))
+        self._sourceEvent = sourceEvent
+        self._sourceEventHash = self.sourceEvent.hash
+
+    @actualSource.setter
+    def actualSource(self, actualSource):
+        self._actualSource = actualSource
+
+    @moduleDataSource.setter
+    def moduleDataSource(self, moduleDataSource):
+        self._moduleDataSource = moduleDataSource
 
     def asDict(self):
-        """Return event as dictionary.
-
+        """
         Returns:
             dict: event as dictionary
         """
@@ -2935,86 +3166,17 @@ class SpiderFootEvent(object):
             'generated': int(self.generated),
             'type': self.eventType,
             'data': self.data,
-            'module': self.module
+            'module': self.module,
+            'source': ''
         }
 
-        if self.eventType == 'ROOT':
-            evt_dict['source'] = ''
-        else:
-            evt_dict['source'] = self.sourceEvent.data
+        if self.sourceEvent is not None:
+            if self.sourceEvent.data is not None:
+                evt_dict['source'] = self.sourceEvent.data
 
         return evt_dict
 
     def getHash(self):
-        """ Unique hash of this event.
-
-        Returns:
-            str: unique SHA256 hash of the event, or "ROOT"
-        """
-
-        if self.eventType == "ROOT":
-            return "ROOT"
-
-        digestStr = self.__id.encode('raw_unicode_escape')
-        return hashlib.sha256(digestStr).hexdigest()
-
-    def setConfidence(self, confidence):
-        """Update event confidence attribute as new information becomes available.
-
-        Args:
-            confidence (int): confidence (0 to 100)
-
-        Raises:
-            TypeError: confidence type was invalid
-            ValueError: confidence value was invalid
-        """
-        if not isinstance(confidence, int):
-            raise TypeError("confidence is %s; expected int()" % type(confidence))
-        if confidence > 100 or confidence < 0:
-            raise ValueError("Invalid confidence: %s. Must be between 0 and 100" % confidence)
-
-        self.confidence = confidence
-
-    def setVisibility(self, visibility):
-        """Update event visibility attribute.
-
-        Args:
-            visibility (int): visibility (0 to 100)
-
-        Raises:
-            TypeError: visibility type was invalid
-            ValueError: visibility value was invalid
-        """
-        if not isinstance(visibility, int):
-            raise TypeError("visibility is %s; expected int()" % type(visibility))
-        if visibility > 100 or visibility < 0:
-            raise ValueError("Invalid visibility: %s. Must be between 0 and 100" % visibility)
-
-        self.visibility = visibility
-
-    def setRisk(self, risk):
-        """Update event risk attribute.
-
-        Args:
-            risk (int): risk (0 to 100)
-
-        Raises:
-            TypeError: risk type was invalid
-            ValueError: risk value was invalid
-        """
-        if not isinstance(risk, int):
-            raise TypeError("risk is %s; expected int()" % type(risk))
-        if risk > 100 or risk < 0:
-            raise ValueError("Invalid risk: %s. Must be between 0 and 100" % risk)
-
-        self.risk = risk
-
-    def setSourceEventHash(self, srcHash):
-        """Update event source event hash attribute.
-
-        Args:
-            srcHash (str): source event hash
-        """
-
-        self.sourceEventHash = srcHash
+        """Required for SpiderFoot HX compatibility of modules"""
+        return self.hash
 

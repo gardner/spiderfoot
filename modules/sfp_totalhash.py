@@ -30,10 +30,30 @@ malchecks = {
 class sfp_totalhash(SpiderFootPlugin):
     """TotalHash.com:Investigate,Passive:Reputation Systems::Check if a host/domain or IP is malicious according to TotalHash.com."""
 
+    meta = {
+        'name': "TotalHash.com",
+        'summary': "Check if a host/domain or IP is malicious according to TotalHash.com.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://totalhash.cymru.com/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://totalhash.cymru.com/contact-us/",
+                "https://totalhash.cymru.com/glossary/",
+                "https://totalhash.cymru.com/browse/"
+            ],
+            'favIcon': "https://www.google.com/s2/favicons?domain=https://totalhash.cymru.com/",
+            'logo': "https://totalhash.cymru.com/wp-content/uploads/2014/12/TC_logo-300x141.png",
+            'description': "#totalhash provides static and dynamic analysis of Malware samples. "
+                                "The data available on this site is free for non commercial use. "
+                                "If you have samples that you would like analyzed you may upload them to our anonymous FTP server.",
+        }
+    }
 
     # Default options
     opts = {
-        '_totalhash': True,
         'checkaffiliates': True,
         'checkcohosts': True
     }
@@ -227,38 +247,38 @@ class sfp_totalhash(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

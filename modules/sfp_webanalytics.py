@@ -18,6 +18,14 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_webanalytics(SpiderFootPlugin):
     """Web Analytics Extractor:Footprint,Investigate,Passive:Content Analysis::Identify web analytics IDs in scraped webpages and DNS TXT records."""
 
+    meta = {
+        'name': "Web Analytics Extractor",
+        'summary': "Identify web analytics IDs in scraped webpages and DNS TXT records.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint", "Investigate", "Passive" ],
+        'categories': [ "Content Analysis" ]
+    }
+
     opts = {}
     optdescs = {}
 
@@ -53,6 +61,11 @@ class sfp_webanalytics(SpiderFootPlugin):
 
         self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
 
+        if event.moduleDataSource:
+            datasource = event.moduleDataSource
+        else:
+            datasource = "Unknown"
+
         if eventName == 'TARGET_WEB_CONTENT':
             # Google Analytics
             matches = re.findall(r"\bua\-\d{4,10}\-\d{1,4}\b", eventData, re.IGNORECASE)
@@ -68,6 +81,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Google Analytics: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Google AdSense
@@ -80,6 +94,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Google AdSense: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Google Website Verification
@@ -90,6 +105,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Google Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             matches = re.findall(r'<meta name="verify-v1" content="([a-z0-9\-\+_=]{43,44})"', eventData, re.IGNORECASE)
@@ -98,6 +114,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Google Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Quantcast
@@ -108,6 +125,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                     evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                           "Quantcast: " + m,
                                           self.__name__, event)
+                    evt.moduleDataSource = datasource
                     self.notifyListeners(evt)
 
             # Ahrefs Site Verification
@@ -117,6 +135,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Ahrefs Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
         if eventName == 'DNS_TEXT':
@@ -127,6 +146,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Google Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # LogMeIn Domain Verification
@@ -136,6 +156,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "LogMeIn Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             matches = re.findall(r'logmein-verification-code=([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$', eventData.strip(), re.IGNORECASE)
@@ -143,6 +164,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "LogMeIn Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # DocuSign Domain Verification
@@ -152,6 +174,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "DocuSign Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # GlobalSign Site Verification
@@ -161,6 +184,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "GlobalSign Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Atlassian Domain Verification
@@ -170,6 +194,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Atlassian Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Adobe IDP Site Verification
@@ -179,6 +204,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Adobe IDP Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             matches = re.findall(r'adobe-idp-site-verification=([a-f0-9]{64})$', eventData.strip(), re.IGNORECASE)
@@ -186,6 +212,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Adobe IDP Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Adobe Domain Verification
@@ -195,6 +222,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Adobe Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Stripe Domain Verification
@@ -204,6 +232,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Stripe Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
 
@@ -214,6 +243,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "TeamViewer SSO Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Aliyun Site Verification
@@ -222,6 +252,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Aliyun Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Facebook Domain Verification
@@ -231,6 +262,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Facebook Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Citrix Domain Verification
@@ -239,6 +271,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Citrix Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Dropbox Domain Verification
@@ -248,6 +281,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Dropbox Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Detectify Domain Verification
@@ -257,6 +291,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Detectify Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Drift Domain Verification
@@ -265,6 +300,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Drift Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Ahrefs Site Verification
@@ -274,6 +310,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Ahrefs Site Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Statuspage.io Domain Verification
@@ -283,6 +320,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Statuspage Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Zoom.us Domain Verification
@@ -292,6 +330,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Zoom.us Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Mail.ru Domain Verification
@@ -300,6 +339,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Mail.ru Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Yandex Domain Verification
@@ -308,6 +348,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Yandex Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Brave Ledger Verification
@@ -317,6 +358,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Brave Ledger Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # have-i-been-pwned Verification
@@ -325,6 +367,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "have-i-been-pwned Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
             # Cisco Live Domain Verification
@@ -334,6 +377,7 @@ class sfp_webanalytics(SpiderFootPlugin):
                 evt = SpiderFootEvent("WEB_ANALYTICS_ID",
                                       "Cisco Live Domain Verification: " + m,
                                       self.__name__, event)
+                evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
 
         return None

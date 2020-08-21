@@ -19,6 +19,14 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_dnsresolve(SpiderFootPlugin):
     """DNS Resolver:Footprint,Investigate,Passive:DNS::Resolves Hosts and IP Addresses identified, also extracted from raw content."""
 
+    meta = {
+        'name': "DNS Resolver",
+        'summary': "Resolves Hosts and IP Addresses identified, also extracted from raw content.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint", "Investigate", "Passive" ],
+        'categories': [ "DNS" ]
+    }
+
     # Default options
     opts = {
         'validatereverse': True,
@@ -155,7 +163,7 @@ class sfp_dnsresolve(SpiderFootPlugin):
             # We get literal \n from RAW_RIR_DATA in cases where JSON responses
             # have been str()'d, breaking interpretation of hostnames.
             if eventName == 'RAW_RIR_DATA':
-                data = eventData.replace('\\n', '\n')
+                data = data.replace('\\n', '\n')
 
             for name in self.getTarget().getNames():
                 if self.checkForStop():
@@ -165,7 +173,7 @@ class sfp_dnsresolve(SpiderFootPlugin):
                 if offset < 0:
                     continue
 
-                pat = re.compile("[^a-z0-9\-\.\%]([a-z0-9\-\.\%]*\." + name + ")", re.DOTALL|re.MULTILINE)
+                pat = re.compile("[^a-z0-9\-\.]([a-z0-9\-\.]*\." + name + ")", re.DOTALL|re.MULTILINE)
                 while offset >= 0:
                     # If the target was found at the beginning of the content, skip past it
                     if offset == 0:
@@ -190,9 +198,6 @@ class sfp_dnsresolve(SpiderFootPlugin):
                                     m = match[1:]
                                 else:
                                     m = match
-                                # Remove URL-encoded stuff
-                                if '%' in m:
-                                    m = urllib2.unquote(m)
                                 self.processHost(m, parentEvent, False)
                     except Exception as e:
                         self.sf.error("Error applying regex to data (" + str(e) + ")", False)

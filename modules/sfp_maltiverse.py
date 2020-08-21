@@ -19,6 +19,27 @@ from datetime import datetime
 class sfp_maltiverse(SpiderFootPlugin):
     """Maltiverse:Investigate,Passive:Reputation Systems::Obtain information about any malicious activities involving IP addresses"""
 
+    meta = {
+        'name': "Maltiverse",
+        'summary': "Obtain information about any malicious activities involving IP addresses",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://maltiverse.com",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://maltiverse.com/faq",
+                "https://app.swaggerhub.com/apis-docs/maltiverse/api/1.0.0-oas3"
+            ],
+            'favIcon': "https://maltiverse.com/favicon.ico",
+            'logo': "https://maltiverse.com/assets/images/logo/logo.png",
+            'description': "The Open IOC Search Engine.\n"
+                                "Enhance your SIEM or Firewall and crosscheck your event data with "
+                                "top quality Threat Intelligence information to highlight what requires action.",
+        }
+    }
+
     opts = {
         'checkaffiliates': True,
         'subnetlookup': False,
@@ -181,7 +202,7 @@ class sfp_maltiverse(SpiderFootPlugin):
                 evt = SpiderFootEvent("RAW_RIR_DATA", str(data), self.__name__, event)
                 self.notifyListeners(evt)
             
-            maliciousIPDesc = "Maltiverse [ " + str(maliciousIP) + " ]\n"
+            maliciousIPDesc = "Maltiverse [" + str(maliciousIP) + " ]\n"
 
             for blacklistedRecord in blacklistedRecords:
                 lastSeen = blacklistedRecord.get('last_seen')

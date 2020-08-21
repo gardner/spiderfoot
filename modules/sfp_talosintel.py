@@ -28,10 +28,33 @@ malchecks = {
 class sfp_talosintel(SpiderFootPlugin):
     """Talos Intelligence:Investigate,Passive:Reputation Systems::Check if a netblock or IP is malicious according to talosintelligence.com."""
 
+    meta = {
+        'name': "Talos Intelligence",
+        'summary': "Check if a netblock or IP is malicious according to talosintelligence.com.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://talosintelligence.com/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://talosintelligence.com/vulnerability_info",
+                "https://talosintelligence.com/reputation"
+            ],
+            'favIcon': "https://talosintelligence.com/assets/favicons/favicon-49c9b25776778ff43873cf5ebde2e1ffcd0747ad1042ac5a5306cdde3ffca8cd.ico",
+            'logo': "https://talosintelligence.com/assets/favicons/favicon-49c9b25776778ff43873cf5ebde2e1ffcd0747ad1042ac5a5306cdde3ffca8cd.ico",
+            'description': "Cisco Talos Incident Response provides a full suite of proactive and reactive services "
+                                "to help you prepare, respond and recover from a breach. "
+                                "With Talos IR, you have direct access to the same threat intelligence available "
+                                "to Cisco and world-class emergency response capabilities — "
+                                "in addition to more than 350 threat researchers for questions and analysis. "
+                                "Let our experts work with you to evaluate existing plans, develop a new plan, "
+                                "and provide rapid assistance when you need it most.",
+        }
+    }
 
     # Default options
     opts = {
-        '_talosintel': True,
         'checkaffiliates': True,
         'cacheperiod': 18,
         'checknetblocks': True,
@@ -231,45 +254,45 @@ class sfp_talosintel(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                if eventName == 'NETBLOCK_OWNER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_NETBLOCK'
-                if eventName == 'NETBLOCK_MEMBER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_SUBNET'
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName == 'NETBLOCK_OWNER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_NETBLOCK'
+            if eventName == 'NETBLOCK_MEMBER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_SUBNET'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+               return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+               text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+               evt = SpiderFootEvent(evtType, text, self.__name__, event)
+               self.notifyListeners(evt)
 
         return None
 

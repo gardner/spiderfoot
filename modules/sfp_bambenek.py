@@ -35,6 +35,30 @@ malchecks = {
 class sfp_bambenek(SpiderFootPlugin):
     """Bambenek C&C List:Investigate,Passive:Reputation Systems::Check if a host/domain or IP appears on Bambenek Consulting's C&C tracker lists."""
 
+    meta = {
+        'name': "Bambenek C&C List",
+        'summary': "Check if a host/domain or IP appears on Bambenek Consulting's C&C tracker lists.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "http://www.bambenekconsulting.com/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "http://www.bambenekconsulting.com/free-osint-tools/",
+                "https://osint.bambenekconsulting.com/feeds/",
+                "https://osint.bambenekconsulting.com/feeds/license.txt"
+            ],
+            'favIcon': "http://www.bambenekconsulting.com/wp-content/uploads/2013/04/mini-logo1.ico",
+            'logo': "http://www.bambenekconsulting.com/wp-content/uploads/2013/04/logo_transparent21-300x84.png",
+            'description': "Bambenek Consulting is an cybersecurity investigations and intelligence consulting firm "
+                                "focusing on tackling major criminal threats. "
+                                "Every day, there is another story about another company having their banking accounts drained, "
+                                "someone having their identity stolen, or critical infrastructure being taken offline by hostile entities. "
+                                "Led by IT security expert, John Bambenek, we have the resources to bring to your business so "
+                                "you can be sure your organization and your customers’ data is safe.",    
+        }
+    }
 
     # Default options
     opts = {
@@ -245,41 +269,41 @@ class sfp_bambenek(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName == 'NETBLOCK_OWNER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_NETBLOCK'
-                if eventName == 'NETBLOCK_MEMBER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_SUBNET'
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName == 'NETBLOCK_OWNER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_NETBLOCK'
+            if eventName == 'NETBLOCK_MEMBER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_SUBNET'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

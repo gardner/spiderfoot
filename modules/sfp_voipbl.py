@@ -29,9 +29,29 @@ malchecks = {
 class sfp_voipbl(SpiderFootPlugin):
     """VoIPBL OpenPBX IPs:Investigate,Passive:Reputation Systems::Check if an IP or netblock is an open PBX according to VoIPBL OpenPBX IPs."""
 
+    meta = {
+        'name': "VoIPBL OpenPBX IPs",
+        'summary': "Check if an IP or netblock is an open PBX according to VoIPBL OpenPBX IPs.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "http://www.voipbl.org/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "http://www.voipbl.org/#install",
+                "http://www.voipbl.org/#advanced"
+            ],
+            'favIcon': "",
+            'logo': "http://www.voipbl.org/images/scopserv.png",
+            'description': "Protect your business and PBX's against VoIP Fraud.\n"
+                                "Minimize the risks of attacks on your Telephony Server.\n"
+                                "Save bandwidth by using Geolocation filtering.",
+        }
+    }
+
     # Default options
     opts = {
-        '_voipbl': True,
         'checkaffiliates': True,
         'cacheperiod': 18,
         'checknetblocks': True,
@@ -231,45 +251,45 @@ class sfp_voipbl(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                if eventName == 'NETBLOCK_OWNER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_NETBLOCK'
-                if eventName == 'NETBLOCK_MEMBER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_SUBNET'
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName == 'NETBLOCK_OWNER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_NETBLOCK'
+            if eventName == 'NETBLOCK_MEMBER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_SUBNET'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

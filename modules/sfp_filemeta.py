@@ -24,6 +24,14 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_filemeta(SpiderFootPlugin):
     """File Metadata Extractor:Footprint:Content Analysis::Extracts meta data from documents and images."""
 
+    meta = {
+        'name': "File Metadata Extractor",
+        'summary': "Extracts meta data from documents and images.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint" ],
+        'categories': [ "Content Analysis" ]
+    }
+
     # Default options
     opts = {
         'fileexts': ["docx", "pptx", 'pdf', 'jpg', 'jpeg', 'tiff', 'tif'],
@@ -41,6 +49,7 @@ class sfp_filemeta(SpiderFootPlugin):
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
         self.results = self.tempStorage()
+        self.__dataSource__ = "Target Website"
 
         for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]

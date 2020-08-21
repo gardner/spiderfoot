@@ -29,10 +29,30 @@ malchecks = {
 class sfp_vxvault(SpiderFootPlugin):
     """VXVault.net:Investigate,Passive:Reputation Systems::Check if a domain or IP is malicious according to VXVault.net."""
 
+    meta = {
+        'name': "VXVault.net",
+        'summary': "Check if a domain or IP is malicious according to VXVault.net.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "http://vxvault.net/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "http://vxvault.net/URL_List.php",
+                "https://github.com/InfectedPacket/VxVault"
+            ],
+            'favIcon': "",
+            'logo': "",
+            'description': "VxVault is a malware management program to automatically download and classify malware samples. "
+                                "VxVault downloads malware samples from links from online sources such as webpages or RSS feeds, "
+                                "downloads them and attempts to identify the malware using VirusTotal. "
+                                "It then sort the malware onto a local file system and into a SQLite database.",
+        }
+    }
 
     # Default options
     opts = {
-        '_vxvault': True,
         'checkaffiliates': True,
         'checkcohosts': True,
         'cacheperiod': 18
@@ -228,38 +248,38 @@ class sfp_vxvault(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

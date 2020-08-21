@@ -19,6 +19,27 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_spamcop(SpiderFootPlugin):
     """SpamCop:Investigate,Passive:Reputation Systems::Query various spamcop databases for open relays, open proxies, vulnerable servers, etc."""
 
+    meta = {
+        'name': "SpamCop",
+        'summary': "Query various spamcop databases for open relays, open proxies, vulnerable servers, etc.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://www.spamcop.net/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://www.spamcop.net/help.shtml",
+                "https://www.spamcop.net/bl.shtml",
+                "https://www.spamcop.net/fom-serve/cache/291.html"
+            ],
+            'favIcon': "https://www.spamcop.net/images/favicon.ico",
+            'logo': "https://www.spamcop.net/images/05logo.png",
+            'description': "SpamCop is the premier service for reporting spam. "
+                                "SpamCop determines the origin of unwanted email and reports it "
+                                "to the relevant Internet service providers.",
+        }
+    }
 
     # Default options
     opts = {

@@ -20,6 +20,34 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_fraudguard(SpiderFootPlugin):
     """Fraudguard:Investigate,Passive:Reputation Systems:apikey:Obtain threat information from Fraudguard.io"""
 
+    meta = {
+        'name': "Fraudguard",
+        'summary': "Obtain threat information from Fraudguard.io",
+        'flags': [ "apikey" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://fraudguard.io/",
+            'model': "FREE_AUTH_LIMITED",
+            'references': [
+                "https://docs.fraudguard.io/",
+                "https://faq.fraudguard.io/"
+            ],
+            'apiKeyInstructions': [
+                "Visit app.fraudguard.io/register",
+                "Register a free account",
+                "Navigate to app.fraudguard.io/keys",
+                "The API key combination is listed under Username and Password"
+            ],
+            'favIcon': "https://fraudguard.io/img/favicon.ico",
+            'logo': "https://s3.amazonaws.com/fraudguard.io/img/header.png",
+            'description': "FraudGuard is a service designed to provide an easy way to validate usage "
+                                "by continuously collecting and analyzing real-time internet traffic. "
+                                "Utilizing just a few simple API endpoints we make integration as simple as possible "
+                                "and return data such as: Risk Level, Threat Type, Geo Location, etc. Super fast, super simple.\n"
+                                "Lookup any IP address by querying our threat engine.",
+        }
+    }
 
     # Default options
     opts = {

@@ -29,10 +29,34 @@ malchecks = {
 class sfp_multiproxy(SpiderFootPlugin):
     """multiproxy.org Open Proxies:Investigate,Passive:Secondary Networks::Check if an IP is an open proxy according to multiproxy.org' open proxy list."""
 
+    meta = {
+        'name': "multiproxy.org Open Proxies",
+        'summary': "Check if an IP is an open proxy according to multiproxy.org' open proxy list.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Secondary Networks" ],
+        'dataSource': {
+            'website': "https://multiproxy.org/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://multiproxy.org/faq.htm",
+                "https://multiproxy.org/env_check.htm",
+                "https://multiproxy.org/anon_proxy.htm",
+                "https://multiproxy.org/help.htm"
+            ],
+            'favIcon': "https://www.google.com/s2/favicons?domain=https://multiproxy.org/",
+            'logo': "https://multiproxy.org/images/mproxy_title.png",
+            'description': "MultiProxy is a multifunctional personal proxy server that protects your privacy "
+                                "while on the Internet as well as speeds up your downloads, "
+                                "especially if you are trying to get several files form overseas or from otherwise rather slow server. "
+                                "It can also completely hide your IP address by dynamically connecting to "
+                                "non-transparent anonymizing public proxy servers. "
+                                "You can also test a list of proxy servers and sort them by connection speed and level of anonimity.",
+        }
+    }
 
     # Default options
     opts = {
-        '_multiproxy': True,
         'checkaffiliates': True,
         'cacheperiod': 18
     }
@@ -223,38 +247,38 @@ class sfp_multiproxy(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

@@ -28,12 +28,33 @@ malchecks = {
 class sfp_blocklistde(SpiderFootPlugin):
     """blocklist.de:Investigate,Passive:Reputation Systems::Check if a netblock or IP is malicious according to blocklist.de."""
 
-
-
+    meta = {
+        'name': "blocklist.de",
+        'summary': "Check if a netblock or IP is malicious according to blocklist.de.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "http://www.blocklist.de/en/index.html",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "http://www.blocklist.de/en/api.html",
+                "http://www.blocklist.de/en/rbldns.html",
+                "http://www.blocklist.de/en/httpreports.html",
+                "http://www.blocklist.de/en/export.html",
+                "http://www.blocklist.de/en/delist.html?ip="
+            ],
+            'favIcon': "http://www.blocklist.de/templates/css/logo_web-size.jpg",
+            'logo': "http://www.blocklist.de/templates/css/logo_web-size.jpg",
+            'description': "www.blocklist.de is a free and voluntary service provided by a Fraud/Abuse-specialist, "
+                                "whose servers are often attacked via SSH-, Mail-Login-, FTP-, Webserver- and other services.\n"
+                                "The mission is to report any and all attacks to the respective abuse departments of the infected PCs/servers, "
+                                "to ensure that the responsible provider can inform their customer about the infection and disable the attacker."
+        }
+    }
 
     # Default options
     opts = {
-        '_blocklistde': True,
         'checkaffiliates': True,
         'cacheperiod': 18,
         'checknetblocks': True,
@@ -233,45 +254,44 @@ class sfp_blocklistde(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                if eventName == 'NETBLOCK_OWNER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_NETBLOCK'
-                if eventName == 'NETBLOCK_MEMBER':
-                    typeId = 'netblock'
-                    evtType = 'MALICIOUS_SUBNET'
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName == 'NETBLOCK_OWNER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_NETBLOCK'
+            if eventName == 'NETBLOCK_MEMBER':
+                typeId = 'netblock'
+                evtType = 'MALICIOUS_SUBNET'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

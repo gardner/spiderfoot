@@ -17,6 +17,26 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_leakix(SpiderFootPlugin):
     """LeakIX:Footprint,Investigate,Passive:Leaks, Dumps and Breaches::Search LeakIX for host data leaks, open ports, software and geoip."""
 
+    meta = {
+        'name': "LeakIX",
+        'summary': "Search LeakIX for host data leaks, open ports, software and geoip.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint", "Investigate", "Passive" ],
+        'categories': [ "Leaks, Dumps and Breaches" ],
+        'dataSource': {
+            'website': "https://leakix.net/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://leakix.net/api-documentation"
+            ],
+            'favIcon': "https://leakix.net/public/img/favicon.png",
+            'logo': "https://leakix.net/public/img/logoleakix-v1.png",
+            'description': "LeakIX provides insights into devices and servers that are compromised "
+                                "and compromised database schemas online.\n"
+                                "In this scope we inspect found services for weak credentials.",
+        }
+    }
+
     # Default options
     opts = {
         'delay': 1,

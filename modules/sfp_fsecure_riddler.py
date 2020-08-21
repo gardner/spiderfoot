@@ -17,6 +17,34 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_fsecure_riddler(SpiderFootPlugin):
     """F-Secure Riddler.io:Investigate,Footprint,Passive:Search Engines:apikey:Obtain network information from F-Secure Riddler.io API."""
 
+    meta = {
+        'name': "F-Secure Riddler.io",
+        'summary': "Obtain network information from F-Secure Riddler.io API.",
+        'flags': [ "apikey" ],
+        'useCases': [ "Investigate", "Footprint", "Passive" ],
+        'categories': [ "Search Engines" ],
+        'dataSource': {
+            'website': "https://riddler.io/",
+            'model': "PRIVATE_ONLY",
+            'references': [
+                "https://riddler.io/help/api",
+                "https://riddler.io/help/search",
+                "https://riddler.io/static/riddler_white_paper.pdf",
+                "https://www.f-secure.com/en/business/products/vulnerability-management/radar"
+            ],
+            'apiKeyInstructions': [
+                "Registration is disabled for new accounts"
+            ],
+            'favIcon': "https://riddler.io/static/images/favicon.png",
+            'logo': "https://riddler.io/static/images/logo.png",
+            'description': "Riddler.io allows you to search in a high quality dataset with more than 396,831,739 hostnames. "
+                                "Unlike others, we do not rely on simple port scanning techniques - we crawl the web, "
+                                "ensuring an in-depth quality data set you will not find anywhere else.\n"
+                                "Use Riddler to enumerate possible attack vectors during your pen-test or use the very same data "
+                                "to monitor potential threats before it is too late.",
+        }
+    }
+
     opts = {
         'verify': True,
         'username': '',

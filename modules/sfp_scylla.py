@@ -18,6 +18,26 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 class sfp_scylla(SpiderFootPlugin):
     """Scylla:Footprint,Investigate,Passive:Leaks, Dumps and Breaches::Gather breach data from Scylla API."""
 
+    meta = {
+        'name': "Scylla",
+        'summary': "Gather breach data from Scylla API.",
+        'flags': [ "" ],
+        'useCases': [ "Footprint", "Investigate", "Passive" ],
+        'categories': [ "Leaks, Dumps and Breaches" ],
+        'dataSource': {
+            'website': "https://scylla.sh/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://scylla.sh/crowdsource"
+            ],
+            'favIcon': "",
+            'logo': "",
+            'description': "scylla.sh has two major goals. One is to have a community-oriented database leak community "
+                                "that is a useful tool for security researchers.\n"
+                                "The other major goal is to undercut those people that are selling databases.",
+        }
+    }
+
     # Default options
     opts = {
         'pause': 3,

@@ -47,7 +47,7 @@ sfConfig = {
     '_internettlds': 'https://publicsuffix.org/list/effective_tld_names.dat',
     '_internettlds_cache': 72,
     '_genericusers': "abuse,admin,billing,compliance,devnull,dns,ftp,hostmaster,inoc,ispfeedback,ispsupport,list-request,list,maildaemon,marketing,noc,no-reply,noreply,null,peering,peering-notify,peering-request,phish,phishing,postmaster,privacy,registrar,registry,root,routing-registry,rr,sales,security,spam,support,sysadmin,tech,undisclosed-recipients,unsubscribe,usenet,uucp,webmaster,www",
-    '__version__': '3.0',
+    '__version__': '3.2-DEV',
     '__database': 'spiderfoot.db',
     '__webaddr': '127.0.0.1',
     '__webport': 5001,
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     # Legacy way to run the server
     args = None
-    p = argparse.ArgumentParser(description='SpiderFoot 3.0: Open Source Intelligence Automation.')
+    p = argparse.ArgumentParser(description='SpiderFoot 3.1: Open Source Intelligence Automation.')
     p.add_argument("-d", "--debug", action='store_true', help="Enable debug output.")
     p.add_argument("-l", metavar="IP:port", help="IP and port to listen on.")
     p.add_argument("-m", metavar="mod1,mod2,...", type=str, help="Modules to enable.")
@@ -339,6 +339,9 @@ if __name__ == '__main__':
         if args.x and args.t:
             cfg['__outputfilter'] = args.t.split(",")
 
+        if args.o == "json":
+            print("[", end='')
+
         # Start running a new scan
         scanName = target
         scanId = sf.genScanInstanceGUID()
@@ -372,9 +375,6 @@ if __name__ == '__main__':
                 else:
                     print('{0:30}{1}{2:45}{3}{4}{5}{6}'.format("Source", delim, "Type", delim, "Source Data", delim, "Data"))
 
-        if args.o == "json":
-            print("[", end='')
-
         while True:
             info = dbh.scanInstanceGet(scanId)
             if not info:
@@ -390,8 +390,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # Start the web server so you can start looking at results
-    url = 'http://' + sfConfig['__webaddr'] + ":" + str(sfConfig['__webport']) + sfConfig['__docroot']
-    print(('Starting web server at %s ...' % url))
+    print('Starting web server at %s:%s ...' % (sfConfig['__webaddr'], sfConfig['__webport']))
 
     cherrypy.config.update({
         'server.socket_host': sfConfig['__webaddr'],
@@ -402,7 +401,6 @@ if __name__ == '__main__':
     cherrypy.engine.autoreload.unsubscribe()
 
     # Enable access to static files via the web directory
-    currentDir = os.path.abspath(sf.myPath())
     conf = {
         '/query': {
             'tools.encode.text_only': False,
@@ -410,7 +408,8 @@ if __name__ == '__main__':
         },
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': os.path.join(currentDir, 'static')
+            'tools.staticdir.dir': 'static',
+            'tools.staticdir.root': sf.myPath()
         }
     }
 
@@ -447,7 +446,16 @@ if __name__ == '__main__':
                 'tools.auth_digest.key': random.SystemRandom().randint(0, 99999999)
             }
         else:
+            print("")
+            print("********************************************************************")
             print("Warning: passwd file contains no passwords. Authentication disabled.")
+            print("********************************************************************")
+    else:
+            print("")
+            print("********************************************************************")
+            print("Please consider adding authentication to protect this instance!")
+            print("Refer to https://www.spiderfoot.net/documentation/#security.")
+            print("********************************************************************")
 
     key_path = sf.dataPath() + '/spiderfoot.key'
     crt_path = sf.dataPath() + '/spiderfoot.crt'

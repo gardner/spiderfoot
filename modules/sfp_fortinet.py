@@ -30,10 +30,31 @@ malchecks = {
 class sfp_fortinet(SpiderFootPlugin):
     """Fortiguard.com:Investigate,Passive:Reputation Systems::Check if an IP is malicious according to Fortiguard.com."""
 
+    meta = {
+        'name': "Fortiguard.com",
+        'summary': "Check if an IP is malicious according to Fortiguard.com.",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://fortiguard.com/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://docs.fortinet.com/document/fortimail/6.0.4/rest-api-reference",
+                "https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/attachments/d8d8ade1-2fd8-11e9-94bf-00505692583a/FortiMail_REST_API_Reference.pdf"
+            ],
+            'favIcon': "https://fortiguard.com/favicon.ico",
+            'logo': "https://fortiguard.com/static/images/Fortinet-logo%20white.png?v=880",
+            'description': " Fortinet empowers its customers with intelligent, seamless protection across the "
+                                "expanding attack surface and the power to take on ever-increasing performance requirements of "
+                                "the borderless network—today and into the future. "
+                                "Only the Fortinet Security Fabric architecture can deliver security without compromise "
+                                "to address the most critical security challenges, whether in networked, application, cloud, or mobile environments.",
+        }
+    }
 
     # Default options
     opts = {
-        '_fortiguard': True,
         'checkaffiliates': True
     }
 
@@ -223,38 +244,38 @@ class sfp_fortinet(SpiderFootPlugin):
 
         for check in list(malchecks.keys()):
             cid = malchecks[check]['id']
-            # If the module is enabled..
-            if self.opts[cid]:
-                if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
-                    typeId = 'ip'
-                    if eventName == 'IP_ADDRESS':
-                        evtType = 'MALICIOUS_IPADDR'
-                    else:
-                        evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
-                    typeId = 'asn'
-                    evtType = 'MALICIOUS_ASN'
+            if eventName in ['IP_ADDRESS', 'AFFILIATE_IPADDR']:
+                typeId = 'ip'
+                if eventName == 'IP_ADDRESS':
+                    evtType = 'MALICIOUS_IPADDR'
+                else:
+                    evtType = 'MALICIOUS_AFFILIATE_IPADDR'
 
-                if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
-                                 'AFFILIATE_INTERNET_NAME', ]:
-                    typeId = 'domain'
-                    if eventName == "INTERNET_NAME":
-                        evtType = "MALICIOUS_INTERNET_NAME"
-                    if eventName == 'AFFILIATE_INTERNET_NAME':
-                        evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
-                    if eventName == 'CO_HOSTED_SITE':
-                        evtType = 'MALICIOUS_COHOST'
+            if eventName in ['BGP_AS_OWNER', 'BGP_AS_MEMBER']:
+                typeId = 'asn'
+                evtType = 'MALICIOUS_ASN'
 
-                url = self.lookupItem(cid, typeId, eventData)
-                if self.checkForStop():
-                    return None
+            if eventName in ['INTERNET_NAME', 'CO_HOSTED_SITE',
+                             'AFFILIATE_INTERNET_NAME']:
+                typeId = 'domain'
+                if eventName == "INTERNET_NAME":
+                    evtType = "MALICIOUS_INTERNET_NAME"
+                if eventName == 'AFFILIATE_INTERNET_NAME':
+                    evtType = 'MALICIOUS_AFFILIATE_INTERNET_NAME'
+                if eventName == 'CO_HOSTED_SITE':
+                    evtType = 'MALICIOUS_COHOST'
 
-                # Notify other modules of what you've found
-                if url is not None:
-                    text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
-                    evt = SpiderFootEvent(evtType, text, self.__name__, event)
-                    self.notifyListeners(evt)
+            url = self.lookupItem(cid, typeId, eventData)
+
+            if self.checkForStop():
+                return None
+
+            # Notify other modules of what you've found
+            if url is not None:
+                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                evt = SpiderFootEvent(evtType, text, self.__name__, event)
+                self.notifyListeners(evt)
 
         return None
 

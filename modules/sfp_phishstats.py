@@ -19,6 +19,24 @@ import json
 class sfp_phishstats(SpiderFootPlugin):
     """PhishStats:Investigate,Passive:Reputation Systems::Determine if an IP Address is malicious"""
 
+    meta = {
+        'name': "PhishStats",
+        'summary': "Determine if an IP Address is malicious",
+        'flags': [ "" ],
+        'useCases': [ "Investigate", "Passive" ],
+        'categories': [ "Reputation Systems" ],
+        'dataSource': {
+            'website': "https://phishstats.info/",
+            'model': "FREE_NOAUTH_UNLIMITED",
+            'references': [
+                "https://phishstats.info/#apidoc"
+            ],
+            'favIcon': "https://phishstats.info/phish.ico",
+            'logo': "",
+            'description': "PhishStats - is a real time Phishing database that gathers phishing URLs from several sources.",
+        }
+    }
+
     opts = {
         'checkaffiliates': True,
         'subnetlookup': False,
@@ -171,7 +189,7 @@ class sfp_phishstats(SpiderFootPlugin):
                 evt = SpiderFootEvent("RAW_RIR_DATA", str(data), self.__name__, event)
                 self.notifyListeners(evt)
 
-            maliciousIPDesc = "Phishstats [ " + str(maliciousIP) + "]\n"
+            maliciousIPDesc = "Phishstats [" + str(maliciousIP) + "]\n"
 
             maliciousIPDescHash = self.sf.hashstring(maliciousIPDesc)
             if maliciousIPDescHash in self.results:
