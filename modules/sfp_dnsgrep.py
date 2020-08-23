@@ -15,8 +15,6 @@
 # -------------------------------------------------------------------------------
 
 import json
-import re
-import socket
 import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
@@ -116,7 +114,7 @@ class sfp_dnsgrep(SpiderFootPlugin):
             return None
         self.results[eventData] = True
 
-        self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
+        self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         data = self.query(eventData)
 

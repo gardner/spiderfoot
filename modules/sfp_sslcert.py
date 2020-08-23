@@ -10,7 +10,6 @@
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 
-import time
 from urllib.parse import urlparse
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
@@ -79,7 +78,7 @@ class sfp_sslcert(SpiderFootPlugin):
         srcModuleName = event.module
         eventData = event.data
 
-        self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
+        self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         if eventName == "LINKED_URL_INTERNAL":
             if not eventData.lower().startswith("https://") and not self.opts['tryhttp']:

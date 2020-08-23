@@ -16,7 +16,6 @@ import PyPDF2
 import docx
 import pptx
 import exifread
-import lxml
 import io
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
@@ -70,7 +69,7 @@ class sfp_filemeta(SpiderFootPlugin):
         srcModuleName = event.module
         eventData = event.data
 
-        self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
+        self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         if eventData in self.results:
             return None

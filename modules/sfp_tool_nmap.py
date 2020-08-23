@@ -11,8 +11,6 @@
 # -------------------------------------------------------------------------------
 
 from subprocess import Popen, PIPE
-import io
-import json
 import os.path
 from netaddr import IPNetwork
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
@@ -84,7 +82,7 @@ class sfp_tool_nmap(SpiderFootPlugin):
             self.sf.debug("Skipping event from myself.")
             return None
 
-        self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
+        self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         if self.errorState:
             return None

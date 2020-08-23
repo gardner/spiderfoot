@@ -12,7 +12,6 @@
 # -------------------------------------------------------------------------------
 
 import re
-import json
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 import phonenumbers
 from phonenumbers.phonenumberutil import region_code_for_country_code
@@ -291,7 +290,7 @@ class sfp_countryname(SpiderFootPlugin):
         
         evttype = "COUNTRY_NAME"
 
-        self.sf.debug("Received event, %s, from %s" % (eventName, srcModuleName))
+        self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         # Generate event data hash
         eventDataHash = self.sf.hashstring(eventData)
