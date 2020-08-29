@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_alienvaultiprep(SpiderFootPlugin):
-    """AlienVault IP Reputation:Investigate,Passive:Reputation Systems::Check if an IP or netblock is malicious according to the AlienVault IP Reputation database."""
 
     meta = {
         'name': "AlienVault IP Reputation",
@@ -246,7 +245,7 @@ class sfp_alienvaultiprep(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

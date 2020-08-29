@@ -14,7 +14,6 @@
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_iban(SpiderFootPlugin):
-    """IBAN Number Extractor:Footprint,Investigate,Passive:Content Analysis::Identify IBAN Numbers in any data"""
 
     meta = {
         'name': "IBAN Number Extractor",
@@ -26,7 +25,6 @@ class sfp_iban(SpiderFootPlugin):
 
     # Default options.
     opts = {
-         # Options specific to this module
     }
 
     # Option descriptions.

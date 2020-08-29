@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_isc(SpiderFootPlugin):
-    """Internet Storm Center:Investigate,Passive:Reputation Systems::Check if an IP is malicious according to SANS ISC."""
 
     meta = {
         'name': "Internet Storm Center",
@@ -194,7 +193,7 @@ class sfp_isc(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

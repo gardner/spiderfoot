@@ -14,7 +14,6 @@ import re
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_slideshare(SpiderFootPlugin):
-    """SlideShare:Footprint,Investigate,Passive:Social Media::Gather name and location from SlideShare profiles."""
 
     meta = {
         'name': "SlideShare",
@@ -49,7 +48,6 @@ class sfp_slideshare(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = "SlideShare"
         self.results = self.tempStorage()
 
         for opt in list(userOpts.keys()):

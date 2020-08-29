@@ -15,7 +15,6 @@ import json
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_neutrinoapi(SpiderFootPlugin):
-    """NeutrinoAPI:Footprint,Investigate,Passive:Reputation Systems:apikey:Search NeutrinoAPI for IP address info and check IP reputation."""
 
     meta = {
         'name': "NeutrinoAPI",
@@ -197,7 +196,6 @@ class sfp_neutrinoapi(SpiderFootPlugin):
                     self.notifyListeners(evt)
                     evt = SpiderFootEvent("RAW_RIR_DATA", str(data), self.__name__, event)
                     self.notifyListeners(evt)
-
 
         if eventName == 'IP_ADDRESS':
             data = self.queryIpInfo(eventData)

@@ -15,7 +15,6 @@ from datetime import datetime
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_fullcontact(SpiderFootPlugin):
-    """FullContact:Footprint,Investigate,Passive:Search Engines:apikey:Gather domain and e-mail information from fullcontact.com."""
 
     meta = {
         'name': "FullContact",
@@ -125,7 +124,7 @@ class sfp_fullcontact(SpiderFootPlugin):
                     self.sf.debug("Fullcontact.co record found but too old.")
                     return None
         except Exception as e:
-            self.sf.error("Error processing JSON response from fullcontact.com: " + str(e), False)
+            self.sf.error(f"Error processing JSON response from fullcontact.com: {e}", False)
             return None
 
         return ret

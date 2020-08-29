@@ -13,7 +13,6 @@ from sflib import SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_bingsearch(SpiderFootPlugin):
-    """Bing:Footprint,Investigate,Passive:Search Engines:apikey:Obtain information from bing to identify sub-domains and links."""
 
     meta = {
         'name': "Bing",
@@ -130,7 +129,5 @@ class sfp_bingsearch(SpiderFootPlugin):
                 "RAW_RIR_DATA", str(res), self.__name__, event
             )
             self.notifyListeners(evt)
-
-
 
 # End of sfp_bingsearch class

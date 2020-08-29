@@ -17,7 +17,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_gravatar(SpiderFootPlugin):
-    """Gravatar:Footprint,Investigate,Passive:Social Media::Retrieve user information from Gravatar API."""
 
     meta = {
         'name': "Gravatar",
@@ -53,7 +52,6 @@ class sfp_gravatar(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = 'Gravatar'
         self.results = self.tempStorage()
         self.reportedUsers = self.tempStorage()
 
@@ -93,7 +91,7 @@ class sfp_gravatar(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug('Error processing JSON response: ' + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         if data.get('entry') is None or len(data.get('entry')) == 0:
@@ -182,7 +180,6 @@ class sfp_gravatar(SpiderFootPlugin):
                     evt = SpiderFootEvent("USERNAME", v, self.__name__, event)
                     self.notifyListeners(evt)
                     self.reportedUsers[v] = True
-
 
         if data.get('accounts') is not None:
             for account in data.get('accounts'):

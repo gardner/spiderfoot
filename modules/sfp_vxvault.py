@@ -16,17 +16,16 @@ import re
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 malchecks = {
-   'VXVault Malicious URL List': {
+    'VXVault Malicious URL List': {
         'id': '_vxvault',
         'checks': ['ip', 'domain'],
         'url': 'http://vxvault.net/URL_List.php',
         'regex': r'.*\/{0}/.*'
-    }
+     }
 }
 
 
 class sfp_vxvault(SpiderFootPlugin):
-    """VXVault.net:Investigate,Passive:Reputation Systems::Check if a domain or IP is malicious according to VXVault.net."""
 
     meta = {
         'name': "VXVault.net",
@@ -232,7 +231,7 @@ class sfp_vxvault(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

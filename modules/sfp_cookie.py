@@ -14,7 +14,6 @@ import json
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_cookie(SpiderFootPlugin):
-    """Cookie Extractor:Footprint,Investigate,Passive:Content Analysis::Extract Cookies from HTTP headers."""
 
     meta = {
         'name': "Cookie Extractor",
@@ -67,7 +66,7 @@ class sfp_cookie(SpiderFootPlugin):
 
         try:
             jdata = json.loads(eventData)
-            if jdata == None:
+            if jdata is None:
                 return None
         except BaseException:
             self.sf.error("Received HTTP headers from another module in an unexpected format.", False)

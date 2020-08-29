@@ -16,7 +16,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_whatcms(SpiderFootPlugin):
-    """WhatCMS:Footprint,Investigate,Passive:Content Analysis:apikey,slow:Check web technology using WhatCMS.org API."""
 
     meta = {
         'name': "WhatCMS",
@@ -68,7 +67,6 @@ class sfp_whatcms(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = 'WhatCMS'
         self.results = self.tempStorage()
         self.errorState = False
 
@@ -129,7 +127,7 @@ class sfp_whatcms(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug('Error processing JSON response: ' + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         result = data.get('result')

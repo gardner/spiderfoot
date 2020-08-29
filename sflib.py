@@ -225,6 +225,8 @@ class SpiderFoot:
         Returns:
             set: TBD
         """
+        if not data:
+            return set()
 
         mapping = set()
         entities = dict()
@@ -707,18 +709,20 @@ class SpiderFoot:
             for opt in opts['__modules__'][mod]['opts']:
                 if opt.startswith('_') and filterSystem:
                     continue
-                mod_opt = opts['__modules__'][mod]['opts'][opt]
 
-                if isinstance(mod_opt, (int, str)):
-                    storeopts[mod + ":" + opt] = mod_opt
+                mod_opt = f"{mod}:{opt}"
+                mod_opt_val = opts['__modules__'][mod]['opts'][opt]
 
-                if isinstance(mod_opt, bool):
-                    if mod_opt:
-                        storeopts[mod + ":" + opt] = 1
+                if isinstance(mod_opt_val, (int, str)):
+                    storeopts[mod_opt] = mod_opt_val
+
+                if isinstance(mod_opt_val, bool):
+                    if mod_opt_val:
+                        storeopts[mod_opt] = 1
                     else:
-                        storeopts[mod + ":" + opt] = 0
-                if isinstance(mod_opt, list):
-                    storeopts[mod + ":" + opt] = ','.join(str(x) for x in mod_opt)
+                        storeopts[mod_opt] = 0
+                if isinstance(mod_opt_val, list):
+                    storeopts[mod_opt] = ','.join(str(x) for x in mod_opt_val)
 
         return storeopts
 
@@ -855,17 +859,25 @@ class SpiderFoot:
         if not events:
             return modlist
 
-        for mod in list(self.opts['__modules__'].keys()):
-            if self.opts['__modules__'][mod]['provides'] is None:
+        loaded_modules = self.opts.get('__modules__')
+
+        if not loaded_modules:
+            return modlist
+
+        for mod in list(loaded_modules.keys()):
+            provides = loaded_modules[mod].get('provides')
+
+            if not provides:
                 continue
 
-            for evtype in self.opts['__modules__'][mod]['provides']:
-                if evtype in events and mod not in modlist:
-                    modlist.append(mod)
-                if "*" in events and mod not in modlist:
+            if "*" in events:
+                modlist.append(mod)
+
+            for evtype in provides:
+                if evtype in events:
                     modlist.append(mod)
 
-        return modlist
+        return list(set(modlist))
 
     def modulesConsuming(self, events):
         """Return an array of modules that consume the list of types supplied.
@@ -881,18 +893,26 @@ class SpiderFoot:
         if not events:
             return modlist
 
-        for mod in list(self.opts['__modules__'].keys()):
-            if self.opts['__modules__'][mod]['consumes'] is None:
+        loaded_modules = self.opts.get('__modules__')
+
+        if not loaded_modules:
+            return modlist
+
+        for mod in list(loaded_modules.keys()):
+            consumes = loaded_modules[mod].get('consumes')
+
+            if not consumes:
                 continue
 
-            if "*" in self.opts['__modules__'][mod]['consumes'] and mod not in modlist:
+            if "*" in consumes:
                 modlist.append(mod)
+                continue
 
-            for evtype in self.opts['__modules__'][mod]['consumes']:
-                if evtype in events and mod not in modlist:
+            for evtype in consumes:
+                if evtype in events:
                     modlist.append(mod)
 
-        return modlist
+        return list(set(modlist))
 
     def eventsFromModules(self, modules):
         """Return an array of types that are produced by the list of modules supplied.
@@ -908,10 +928,16 @@ class SpiderFoot:
         if not modules:
             return evtlist
 
+        loaded_modules = self.opts.get('__modules__')
+
+        if not loaded_modules:
+            return evtlist
+
         for mod in modules:
-            if mod in list(self.opts['__modules__'].keys()):
-                if self.opts['__modules__'][mod]['provides'] is not None:
-                    for evt in self.opts['__modules__'][mod]['provides']:
+            if mod in list(loaded_modules.keys()):
+                provides = loaded_modules[mod].get('provides')
+                if provides:
+                    for evt in provides:
                         evtlist.append(evt)
 
         return evtlist
@@ -930,10 +956,16 @@ class SpiderFoot:
         if not modules:
             return evtlist
 
+        loaded_modules = self.opts.get('__modules__')
+
+        if not loaded_modules:
+            return evtlist
+
         for mod in modules:
-            if mod in list(self.opts['__modules__'].keys()):
-                if self.opts['__modules__'][mod]['consumes'] is not None:
-                    for evt in self.opts['__modules__'][mod]['consumes']:
+            if mod in list(loaded_modules.keys()):
+                consumes = loaded_modules[mod].get('consumes')
+                if consumes:
+                    for evt in consumes:
                         evtlist.append(evt)
 
         return evtlist
@@ -1221,6 +1253,33 @@ class SpiderFoot:
             return bool(netaddr.IPNetwork(str(cidr)).size > 0)
         except BaseException:
             return False
+
+    def isPublicIpAddress(self, ip):
+        """Check if an IP address is public.
+
+        Args:
+            ip (str): IP address
+
+        Returns:
+            bool: IP address is public
+        """
+        if not isinstance(ip, (str, netaddr.IPAddress)):
+            return False
+        if not self.validIP(ip) and not self.validIP6(ip):
+            return False
+
+        if not netaddr.IPAddress(ip).is_unicast():
+            return False
+
+        if netaddr.IPAddress(ip).is_loopback():
+            return False
+        if netaddr.IPAddress(ip).is_reserved():
+            return False
+        if netaddr.IPAddress(ip).is_multicast():
+            return False
+        if netaddr.IPAddress(ip).is_private():
+            return False
+        return True
 
     def normalizeDNS(self, res):
         """Clean DNS results to be a simple list
@@ -1708,6 +1767,321 @@ class SpiderFoot:
                 self.debug("Skipped invalid credit card number: " + match)
         return list(creditCards)
 
+    def getCountryCodeDict(self):
+        """Dictionary of country codes and associated country names.
+
+        Returns:
+            dict: country codes and associated country names
+        """
+
+        return {
+            "AF": "Afghanistan",
+            "AX": "Aland Islands",
+            "AL": "Albania",
+            "DZ": "Algeria",
+            "AS": "American Samoa",
+            "AD": "Andorra",
+            "AO": "Angola",
+            "AI": "Anguilla",
+            "AQ": "Antarctica",
+            "AG": "Antigua and Barbuda",
+            "AR": "Argentina",
+            "AM": "Armenia",
+            "AW": "Aruba",
+            "AU": "Australia",
+            "AT": "Austria",
+            "AZ": "Azerbaijan",
+            "BS": "Bahamas",
+            "BH": "Bahrain",
+            "BD": "Bangladesh",
+            "BB": "Barbados",
+            "BY": "Belarus",
+            "BE": "Belgium",
+            "BZ": "Belize",
+            "BJ": "Benin",
+            "BM": "Bermuda",
+            "BT": "Bhutan",
+            "BO": "Bolivia",
+            "BQ": "Bonaire, Saint Eustatius and Saba",
+            "BA": "Bosnia and Herzegovina",
+            "BW": "Botswana",
+            "BV": "Bouvet Island",
+            "BR": "Brazil",
+            "IO": "British Indian Ocean Territory",
+            "VG": "British Virgin Islands",
+            "BN": "Brunei",
+            "BG": "Bulgaria",
+            "BF": "Burkina Faso",
+            "BI": "Burundi",
+            "KH": "Cambodia",
+            "CM": "Cameroon",
+            "CA": "Canada",
+            "CV": "Cape Verde",
+            "KY": "Cayman Islands",
+            "CF": "Central African Republic",
+            "TD": "Chad",
+            "CL": "Chile",
+            "CN": "China",
+            "CX": "Christmas Island",
+            "CC": "Cocos Islands",
+            "CO": "Colombia",
+            "KM": "Comoros",
+            "CK": "Cook Islands",
+            "CR": "Costa Rica",
+            "HR": "Croatia",
+            "CU": "Cuba",
+            "CW": "Curacao",
+            "CY": "Cyprus",
+            "CZ": "Czech Republic",
+            "CD": "Democratic Republic of the Congo",
+            "DK": "Denmark",
+            "DJ": "Djibouti",
+            "DM": "Dominica",
+            "DO": "Dominican Republic",
+            "TL": "East Timor",
+            "EC": "Ecuador",
+            "EG": "Egypt",
+            "SV": "El Salvador",
+            "GQ": "Equatorial Guinea",
+            "ER": "Eritrea",
+            "EE": "Estonia",
+            "ET": "Ethiopia",
+            "FK": "Falkland Islands",
+            "FO": "Faroe Islands",
+            "FJ": "Fiji",
+            "FI": "Finland",
+            "FR": "France",
+            "GF": "French Guiana",
+            "PF": "French Polynesia",
+            "TF": "French Southern Territories",
+            "GA": "Gabon",
+            "GM": "Gambia",
+            "GE": "Georgia",
+            "DE": "Germany",
+            "GH": "Ghana",
+            "GI": "Gibraltar",
+            "GR": "Greece",
+            "GL": "Greenland",
+            "GD": "Grenada",
+            "GP": "Guadeloupe",
+            "GU": "Guam",
+            "GT": "Guatemala",
+            "GG": "Guernsey",
+            "GN": "Guinea",
+            "GW": "Guinea-Bissau",
+            "GY": "Guyana",
+            "HT": "Haiti",
+            "HM": "Heard Island and McDonald Islands",
+            "HN": "Honduras",
+            "HK": "Hong Kong",
+            "HU": "Hungary",
+            "IS": "Iceland",
+            "IN": "India",
+            "ID": "Indonesia",
+            "IR": "Iran",
+            "IQ": "Iraq",
+            "IE": "Ireland",
+            "IM": "Isle of Man",
+            "IL": "Israel",
+            "IT": "Italy",
+            "CI": "Ivory Coast",
+            "JM": "Jamaica",
+            "JP": "Japan",
+            "JE": "Jersey",
+            "JO": "Jordan",
+            "KZ": "Kazakhstan",
+            "KE": "Kenya",
+            "KI": "Kiribati",
+            "XK": "Kosovo",
+            "KW": "Kuwait",
+            "KG": "Kyrgyzstan",
+            "LA": "Laos",
+            "LV": "Latvia",
+            "LB": "Lebanon",
+            "LS": "Lesotho",
+            "LR": "Liberia",
+            "LY": "Libya",
+            "LI": "Liechtenstein",
+            "LT": "Lithuania",
+            "LU": "Luxembourg",
+            "MO": "Macao",
+            "MK": "Macedonia",
+            "MG": "Madagascar",
+            "MW": "Malawi",
+            "MY": "Malaysia",
+            "MV": "Maldives",
+            "ML": "Mali",
+            "MT": "Malta",
+            "MH": "Marshall Islands",
+            "MQ": "Martinique",
+            "MR": "Mauritania",
+            "MU": "Mauritius",
+            "YT": "Mayotte",
+            "MX": "Mexico",
+            "FM": "Micronesia",
+            "MD": "Moldova",
+            "MC": "Monaco",
+            "MN": "Mongolia",
+            "ME": "Montenegro",
+            "MS": "Montserrat",
+            "MA": "Morocco",
+            "MZ": "Mozambique",
+            "MM": "Myanmar",
+            "NA": "Namibia",
+            "NR": "Nauru",
+            "NP": "Nepal",
+            "NL": "Netherlands",
+            "AN": "Netherlands Antilles",
+            "NC": "New Caledonia",
+            "NZ": "New Zealand",
+            "NI": "Nicaragua",
+            "NE": "Niger",
+            "NG": "Nigeria",
+            "NU": "Niue",
+            "NF": "Norfolk Island",
+            "KP": "North Korea",
+            "MP": "Northern Mariana Islands",
+            "NO": "Norway",
+            "OM": "Oman",
+            "PK": "Pakistan",
+            "PW": "Palau",
+            "PS": "Palestinian Territory",
+            "PA": "Panama",
+            "PG": "Papua New Guinea",
+            "PY": "Paraguay",
+            "PE": "Peru",
+            "PH": "Philippines",
+            "PN": "Pitcairn",
+            "PL": "Poland",
+            "PT": "Portugal",
+            "PR": "Puerto Rico",
+            "QA": "Qatar",
+            "CG": "Republic of the Congo",
+            "RE": "Reunion",
+            "RO": "Romania",
+            "RU": "Russia",
+            "RW": "Rwanda",
+            "BL": "Saint Barthelemy",
+            "SH": "Saint Helena",
+            "KN": "Saint Kitts and Nevis",
+            "LC": "Saint Lucia",
+            "MF": "Saint Martin",
+            "PM": "Saint Pierre and Miquelon",
+            "VC": "Saint Vincent and the Grenadines",
+            "WS": "Samoa",
+            "SM": "San Marino",
+            "ST": "Sao Tome and Principe",
+            "SA": "Saudi Arabia",
+            "SN": "Senegal",
+            "RS": "Serbia",
+            "CS": "Serbia and Montenegro",
+            "SC": "Seychelles",
+            "SL": "Sierra Leone",
+            "SG": "Singapore",
+            "SX": "Sint Maarten",
+            "SK": "Slovakia",
+            "SI": "Slovenia",
+            "SB": "Solomon Islands",
+            "SO": "Somalia",
+            "ZA": "South Africa",
+            "GS": "South Georgia and the South Sandwich Islands",
+            "KR": "South Korea",
+            "SS": "South Sudan",
+            "ES": "Spain",
+            "LK": "Sri Lanka",
+            "SD": "Sudan",
+            "SR": "Suriname",
+            "SJ": "Svalbard and Jan Mayen",
+            "SZ": "Swaziland",
+            "SE": "Sweden",
+            "CH": "Switzerland",
+            "SY": "Syria",
+            "TW": "Taiwan",
+            "TJ": "Tajikistan",
+            "TZ": "Tanzania",
+            "TH": "Thailand",
+            "TG": "Togo",
+            "TK": "Tokelau",
+            "TO": "Tonga",
+            "TT": "Trinidad and Tobago",
+            "TN": "Tunisia",
+            "TR": "Turkey",
+            "TM": "Turkmenistan",
+            "TC": "Turks and Caicos Islands",
+            "TV": "Tuvalu",
+            "VI": "U.S. Virgin Islands",
+            "UG": "Uganda",
+            "UA": "Ukraine",
+            "AE": "United Arab Emirates",
+            "GB": "United Kingdom",
+            "US": "United States",
+            "UM": "United States Minor Outlying Islands",
+            "UY": "Uruguay",
+            "UZ": "Uzbekistan",
+            "VU": "Vanuatu",
+            "VA": "Vatican",
+            "VE": "Venezuela",
+            "VN": "Vietnam",
+            "WF": "Wallis and Futuna",
+            "EH": "Western Sahara",
+            "YE": "Yemen",
+            "ZM": "Zambia",
+            "ZW": "Zimbabwe",
+            # Below are not country codes but recognized as regions / TLDs
+            "AC": "Ascension Island",
+            "EU": "European Union",
+            "SU": "Soviet Union",
+            "UK": "United Kingdom"
+        }
+
+    def countryNameFromCountryCode(self, countryCode):
+        """Convert a country code to full country name
+
+        Args:
+            countryCode (str): country code
+
+        Returns:
+            str: country name
+        """
+        if not isinstance(countryCode, str):
+            return None
+
+        return self.getCountryCodeDict().get(countryCode.upper())
+
+    def countryNameFromTld(self, tld):
+        """Retrieve the country name associated with a TLD.
+
+        Args:
+            tld (str): Top level domain
+
+        Returns:
+            str: country name
+        """
+
+        if not isinstance(tld, str):
+            return None
+
+        country_name = self.getCountryCodeDict().get(tld.upper())
+
+        if country_name:
+            return country_name
+
+        country_tlds = {
+            # List of TLD not associated with any country
+            "COM": "United States",
+            "NET": "United States",
+            "ORG": "United States",
+            "GOV": "United States",
+            "MIL": "United States"
+        }
+
+        country_name = country_tlds.get(tld.upper())
+
+        if country_name:
+            return country_name
+
+        return None
+
     def parseIBANNumbers(self, data):
         """Find all International Bank Account Numbers (IBANs) within the supplied content.
 
@@ -1722,7 +2096,6 @@ class SpiderFoot:
         Returns:
             list: list of IBAN
         """
-
         if not isinstance(data, str):
             return list()
 
@@ -2470,7 +2843,7 @@ class SpiderFootPlugin():
     __sfdb__ = None
     # ID of the scan the module is running against
     __scanId__ = None
-    # (Unused) tracking of data sources
+    # (only used in SpiderFoot HX) tracking of data sources
     __dataSource__ = None
     # If set, events not matching this list are dropped
     __outputFilter__ = None
@@ -3188,7 +3561,7 @@ class SpiderFootEvent():
             raise TypeError(f"data is {type(data)}; expected str()")
 
         if not data:
-            raise ValueError("data is empty")
+            raise ValueError(f"data is empty: '{str(data)}'")
 
         self._data = data
 

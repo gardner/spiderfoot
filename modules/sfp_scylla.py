@@ -16,7 +16,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_scylla(SpiderFootPlugin):
-    """Scylla:Footprint,Investigate,Passive:Leaks, Dumps and Breaches::Gather breach data from Scylla API."""
 
     meta = {
         'name': "Scylla",
@@ -107,7 +106,7 @@ class sfp_scylla(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug('Error processing JSON response: ' + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         return data

@@ -18,7 +18,6 @@ from sflib import SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_intelx(SpiderFootPlugin):
-    """IntelligenceX:Investigate,Passive:Search Engines:apikey:Obtain information from IntelligenceX about identified IP addresses, domains, e-mail addresses and phone numbers."""
 
     meta = {
         'name': "IntelligenceX",
@@ -138,7 +137,7 @@ class sfp_intelx(SpiderFootPlugin):
         try:
             ret = json.loads(res['content'])
         except Exception as e:
-            self.sf.error("Error processing JSON response from IntelligenceX: " + str(e), False)
+            self.sf.error(f"Error processing JSON response from IntelligenceX: {e}", False)
             self.errorState = True
             return None
 
@@ -277,8 +276,5 @@ class sfp_intelx(SpiderFootPlugin):
                 if evt == "INTERNET_NAME" and self.sf.isDomain(val, self.opts['_internettlds']):
                     e = SpiderFootEvent("DOMAIN_NAME", val, self.__name__, event)
                     self.notifyListeners(e)
-
-
-
 
 # End of sfp_intelx class

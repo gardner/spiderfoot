@@ -18,7 +18,6 @@ from sflib import SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_dnsresolve(SpiderFootPlugin):
-    """DNS Resolver:Footprint,Investigate,Passive:DNS::Resolves Hosts and IP Addresses identified, also extracted from raw content."""
 
     meta = {
         'name': "DNS Resolver",
@@ -92,17 +91,17 @@ class sfp_dnsresolve(SpiderFootPlugin):
     # What events is this module interested in for input
     def watchedEvents(self):
         return [
-                # Events that need some kind of DNS treatment
-                "CO_HOSTED_SITE", "AFFILIATE_INTERNET_NAME", "NETBLOCK_OWNER",
-                "IP_ADDRESS", "IPV6_ADDRESS", "INTERNET_NAME", "AFFILIATE_IPADDR",
-                # Events that may contain hostnames in their content
-                "TARGET_WEB_CONTENT", "BASE64_DATA", "AFFILIATE_DOMAIN_WHOIS",
-                "CO_HOSTED_SITE_DOMAIN_WHOIS", "DOMAN_WHOIS", "NETBLOCK_WHOIS",
-                "LEAKSITE_CONTENT", "RAW_DNS_RECORDS", "RAW_FILE_META_DATA",
-                "RAW_RIR_DATA", "SEARCH_ENGINE_WEB_CONTENT", "SIMILARDOMAIN_WHOIS",
-                "SSL_CERTIFICATE_RAW", "SSL_CERTIFICATE_ISSUED", "TCP_PORT_OPEN_BANNER",
-                "WEBSERVER_BANNER", "WEBSERVER_HTTPHEADERS"
-                ]
+            # Events that need some kind of DNS treatment
+            "CO_HOSTED_SITE", "AFFILIATE_INTERNET_NAME", "NETBLOCK_OWNER",
+            "IP_ADDRESS", "IPV6_ADDRESS", "INTERNET_NAME", "AFFILIATE_IPADDR",
+            # Events that may contain hostnames in their content
+            "TARGET_WEB_CONTENT", "BASE64_DATA", "AFFILIATE_DOMAIN_WHOIS",
+            "CO_HOSTED_SITE_DOMAIN_WHOIS", "DOMAN_WHOIS", "NETBLOCK_WHOIS",
+            "LEAKSITE_CONTENT", "RAW_DNS_RECORDS", "RAW_FILE_META_DATA",
+            "RAW_RIR_DATA", "SEARCH_ENGINE_WEB_CONTENT", "SIMILARDOMAIN_WHOIS",
+            "SSL_CERTIFICATE_RAW", "SSL_CERTIFICATE_ISSUED", "TCP_PORT_OPEN_BANNER",
+            "WEBSERVER_BANNER", "WEBSERVER_HTTPHEADERS"
+        ]
 
     # What events this module produces
     # This is to support the end user in selecting modules based on events

@@ -19,7 +19,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_dnsgrep(SpiderFootPlugin):
-    """DNSGrep:Footprint,Investigate,Passive:Passive DNS::Obtain Passive DNS information from Rapid7 Sonar Project using DNSGrep API."""
 
     meta = {
         'name': "DNSGrep",
@@ -159,7 +158,7 @@ class sfp_dnsgrep(SpiderFootPlugin):
             evt_type = "INTERNET_NAME"
 
             if self.opts["dns_resolve"] and not self.sf.resolveHost(domain):
-                self.sf.debug("Host " + domain + " could not be resolved")
+                self.sf.debug(f"Host {domain} could not be resolved")
                 evt_type += "_UNRESOLVED"
 
             evt = SpiderFootEvent(evt_type, domain, self.__name__, event)

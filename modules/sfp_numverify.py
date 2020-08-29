@@ -16,7 +16,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_numverify(SpiderFootPlugin):
-    """numverify:Footprint,Investigate,Passive:Real World:apikey:Lookup phone number location and carrier information from numverify.com."""
 
     meta = {
         'name': "numverify",
@@ -62,7 +61,6 @@ class sfp_numverify(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = "numverify"
         self.results = self.tempStorage()
         self.errorState = False
 
@@ -118,7 +116,7 @@ class sfp_numverify(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug('Error processing JSON response: ' + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         if data.get('error') is not None:
@@ -157,14 +155,15 @@ class sfp_numverify(SpiderFootPlugin):
         evt = SpiderFootEvent("RAW_RIR_DATA", str(data), self.__name__, event)
         self.notifyListeners(evt)
 
-        if data.get('country_code') is not None:
-            location = ', '.join([_f for _f in [data.get('location'), data.get('country_code')] if _f])
+        if data.get('country_code'):
+            country = self.sf.countryNameFromCountryCode(data.get('country_code'))
+            location = ', '.join([_f for _f in [data.get('location'), country] if _f])
             evt = SpiderFootEvent("GEOINFO", location, self.__name__, event)
             self.notifyListeners(evt)
         else:
             self.sf.debug("No location information found for " + eventData)
 
-        if data.get('carrier') is not None:
+        if data.get('carrier'):
             evt = SpiderFootEvent("PROVIDER_TELCO", data.get('carrier'), self.__name__, event)
             self.notifyListeners(evt)
         else:

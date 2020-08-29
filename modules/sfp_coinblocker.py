@@ -31,7 +31,6 @@ malchecks = {
 }
 
 class sfp_coinblocker(SpiderFootPlugin):
-    """CoinBlocker Lists:Investigate,Passive:Reputation Systems::Check if a host/domain or IP appears on CoinBlocker lists."""
 
     meta = {
         'name': "CoinBlocker Lists",
@@ -254,7 +253,7 @@ class sfp_coinblocker(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

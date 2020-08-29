@@ -25,7 +25,6 @@ malchecks = {
 
 
 class sfp_talosintel(SpiderFootPlugin):
-    """Talos Intelligence:Investigate,Passive:Reputation Systems::Check if a netblock or IP is malicious according to talosintelligence.com."""
 
     meta = {
         'name': "Talos Intelligence",
@@ -245,7 +244,7 @@ class sfp_talosintel(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

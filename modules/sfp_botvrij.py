@@ -16,7 +16,7 @@ import re
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 malchecks = {
-   'botvrij.eu Domain Blocklist': {
+    'botvrij.eu Domain Blocklist': {
         'id': '_botvrij',
         'checks': ['domain'],
         'url': 'https://www.botvrij.eu/data/blocklist/blocklist_full.csv',
@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_botvrij(SpiderFootPlugin):
-    """botvrij.eu:Investigate,Passive:Reputation Systems::Check if a domain is malicious according to botvrij.eu."""
 
     meta = {
         'name': "botvrij.eu",
@@ -219,7 +218,7 @@ class sfp_botvrij(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

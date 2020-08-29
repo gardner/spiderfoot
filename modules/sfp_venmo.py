@@ -14,7 +14,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_venmo(SpiderFootPlugin):
-    """Venmo:Footprint,Investigate,Passive:Social Media::Gather user information from Venmo API."""
 
     meta = {
         'name': "Venmo",
@@ -72,7 +71,7 @@ class sfp_venmo(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug('Error processing JSON response: ' + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         json_data = data.get('data')

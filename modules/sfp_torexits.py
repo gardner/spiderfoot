@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_torexits(SpiderFootPlugin):
-    """TOR Exit Nodes:Investigate,Passive:Secondary Networks::Check if an IP or netblock appears on the torproject.org exit node list."""
 
     meta = {
         'name': "TOR Exit Nodes",
@@ -229,7 +228,7 @@ class sfp_torexits(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

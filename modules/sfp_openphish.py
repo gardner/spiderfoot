@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_openphish(SpiderFootPlugin):
-    """OpenPhish:Investigate,Passive:Reputation Systems::Check if a host/domain is malicious according to OpenPhish.com."""
 
     meta = {
         'name': "OpenPhish",
@@ -229,7 +228,7 @@ class sfp_openphish(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

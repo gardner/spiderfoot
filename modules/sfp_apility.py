@@ -16,7 +16,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_apility(SpiderFootPlugin):
-    """Apility:Footprint,Investigate,Passive:Reputation Systems:apikey:Search Apility API for IP address and domain reputation."""
 
     meta = {
         'name': "Apility",
@@ -110,7 +109,6 @@ class sfp_apility(SpiderFootPlugin):
         time.sleep(self.opts['delay'])
 
         return self.parseApiResponse(res)
-
 
     # Query IP REST API
     # https://apility.io/apidocs/#full-ip-address-reputation

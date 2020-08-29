@@ -31,7 +31,6 @@ malchecks = {
 }
 
 class sfp_bambenek(SpiderFootPlugin):
-    """Bambenek C&C List:Investigate,Passive:Reputation Systems::Check if a host/domain or IP appears on Bambenek Consulting's C&C tracker lists."""
 
     meta = {
         'name': "Bambenek C&C List",
@@ -256,7 +255,7 @@ class sfp_bambenek(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

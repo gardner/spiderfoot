@@ -16,7 +16,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_jsonwhoiscom(SpiderFootPlugin):
-    """JsonWHOIS.com:Footprint,Investigate,Passive:Search Engines:apikey:Search JsonWHOIS.com for WHOIS records associated with a domain."""
 
     meta = {
         'name': "JsonWHOIS.com",
@@ -221,7 +220,8 @@ class sfp_jsonwhoiscom(SpiderFootPlugin):
                 phone = phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "").replace(".", "")
                 phones.append(phone)
 
-            location = ', '.join([_f for _f in [contact.get('address'), contact.get('city'), contact.get('state'), contact.get('zip'), contact.get('country_code')] if _f])
+            country = self.sf.countryNameFromCountryCode(contact.get('country_code'))
+            location = ', '.join([_f for _f in [contact.get('address'), contact.get('city'), contact.get('state'), contact.get('zip'), country] if _f])
             if location:
                 locations.append(location)
 

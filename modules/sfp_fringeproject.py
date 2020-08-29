@@ -18,7 +18,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_fringeproject(SpiderFootPlugin):
-    """Fringe Project:Investigate,Footprint,Passive:Search Engines::Obtain network information from Fringe Project API."""
 
     meta = {
         'name': "Fringe Project",
@@ -81,7 +80,7 @@ class sfp_fringeproject(SpiderFootPlugin):
         try:
             json_data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug("Error processing JSON response from Fringe Project: " + str(e))
+            self.sf.debug(f"Error processing JSON response from Fringe Project: {e}")
             return None
 
         data = json_data.get('results')

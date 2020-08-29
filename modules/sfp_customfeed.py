@@ -25,7 +25,6 @@ malchecks = {
 }
 
 class sfp_customfeed(SpiderFootPlugin):
-    """Custom Threat Feed:Investigate,Passive:Reputation Systems::Check if a host/domain, netblock, ASN or IP is malicious according to your custom feed."""
 
     meta = {
         'name': "Custom Threat Feed",
@@ -241,7 +240,7 @@ class sfp_customfeed(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

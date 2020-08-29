@@ -18,7 +18,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_spyse(SpiderFootPlugin):
-    """Spyse:Footprint,Investigate,Passive:Passive DNS:apikey:SpiderFoot plug-in to search Spyse API for IP address and domain information."""
 
     meta = {
         'name': "Spyse",
@@ -235,18 +234,18 @@ class sfp_spyse(SpiderFootPlugin):
     # Report extra data in the record
     def reportExtraData(self, record, event):
         operatingSystem = record.get('operation_system')
-        if operatingSystem is not None:
-            evt = SpiderFootEvent('OPERATING_SYSTEM', str(operatingSystem), self.__name__, event)
+        if operatingSystem:
+            evt = SpiderFootEvent('OPERATING_SYSTEM', operatingSystem, self.__name__, event)
             self.notifyListeners(evt)
 
         webServer = record.get('product')
-        if webServer is not None:
-            evt = SpiderFootEvent('WEBSERVER_BANNER', str(webServer), self.__name__, event)
+        if webServer:
+            evt = SpiderFootEvent('WEBSERVER_BANNER', webServer, self.__name__, event)
             self.notifyListeners(evt)
 
         httpHeaders = record.get('http_headers')
-        if httpHeaders is not None:
-            evt = SpiderFootEvent('WEBSERVER_HTTPHEADERS', str(httpHeaders), self.__name__, event)
+        if httpHeaders:
+            evt = SpiderFootEvent('WEBSERVER_HTTPHEADERS', httpHeaders, self.__name__, event)
             self.notifyListeners(evt)
 
     # Handle events sent to this module
@@ -422,7 +421,7 @@ class sfp_spyse(SpiderFootPlugin):
                     continue
 
                 if self.opts['verify'] and not self.sf.resolveHost(domain):
-                    self.sf.debug("Host " + domain + " could not be resolved")
+                    self.sf.debug(f"Host {domain} could not be resolved")
                     evt = SpiderFootEvent("INTERNET_NAME_UNRESOLVED", domain, self.__name__, event)
                     self.notifyListeners(evt)
                 else:

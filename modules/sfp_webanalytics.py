@@ -16,7 +16,6 @@ import re
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_webanalytics(SpiderFootPlugin):
-    """Web Analytics Extractor:Footprint,Investigate,Passive:Content Analysis::Identify web analytics IDs in scraped webpages and DNS TXT records."""
 
     meta = {
         'name': "Web Analytics Extractor",
@@ -234,7 +233,6 @@ class sfp_webanalytics(SpiderFootPlugin):
                                       self.__name__, event)
                 evt.moduleDataSource = datasource
                 self.notifyListeners(evt)
-
 
             # TeamViewer SSO Verification
             # https://community.teamviewer.com/t5/Knowledge-Base/Single-Sign-On-SSO/ta-p/30784

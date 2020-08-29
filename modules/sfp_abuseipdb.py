@@ -23,7 +23,6 @@ malchecks = {
 }
 
 class sfp_abuseipdb(SpiderFootPlugin):
-    """AbuseIPDB:Investigate,Passive:Reputation Systems:apikey:Check if an IP address is malicious according to AbuseIPDB.com."""
 
     meta = {
         'name': "AbuseIPDB",
@@ -237,7 +236,7 @@ class sfp_abuseipdb(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

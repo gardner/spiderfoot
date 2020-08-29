@@ -16,7 +16,6 @@ import re
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_pgp(SpiderFootPlugin):
-    """PGP Key Servers:Footprint,Investigate,Passive:Public Registries::Look up e-mail addresses in PGP public key servers."""
 
     meta = {
         'name': "PGP Key Servers",
@@ -47,7 +46,6 @@ class sfp_pgp(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = "PGP Key Servers"
         self.results = self.tempStorage()
 
         for opt in list(userOpts.keys()):

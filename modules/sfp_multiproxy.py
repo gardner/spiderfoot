@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_multiproxy(SpiderFootPlugin):
-    """multiproxy.org Open Proxies:Investigate,Passive:Secondary Networks::Check if an IP is an open proxy according to multiproxy.org' open proxy list."""
 
     meta = {
         'name': "multiproxy.org Open Proxies",
@@ -85,7 +84,6 @@ class sfp_multiproxy(SpiderFootPlugin):
     # * = be notified about all events.
     def watchedEvents(self):
         return ["IP_ADDRESS", "AFFILIATE_IPADDR"]
-
 
     # What events this module produces
     # This is to support the end user in selecting modules based on events
@@ -232,7 +230,7 @@ class sfp_multiproxy(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

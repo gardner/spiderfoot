@@ -17,7 +17,6 @@ import urllib.request, urllib.parse, urllib.error
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_darksearch(SpiderFootPlugin):
-    """Darksearch:Footprint,Investigate:Search Engines::Search the Darksearch.io Tor search engine for mentions of the target domain."""
 
     meta = {
         'name': "Darksearch",
@@ -60,7 +59,6 @@ class sfp_darksearch(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = "Darksearch"
         self.results = self.tempStorage()
         self.errorState = False
 
@@ -93,7 +91,7 @@ class sfp_darksearch(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug("Error processing JSON response: " + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         return data

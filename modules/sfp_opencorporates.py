@@ -15,7 +15,6 @@ import json
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_opencorporates(SpiderFootPlugin):
-    """OpenCorporates:Passive,Footprint,Investigate:Search Engines::Look up company information from OpenCorporates."""
 
     meta = {
         'name': "OpenCorporates",
@@ -54,7 +53,6 @@ class sfp_opencorporates(SpiderFootPlugin):
 
     def setup(self, sfc, userOpts=dict()):
         self.sf = sfc
-        self.__dataSource__ = "OpenCorporates"
         self.results = self.tempStorage()
 
         for opt in list(userOpts.keys()):
@@ -93,7 +91,7 @@ class sfp_opencorporates(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except Exception as e:
-            self.sf.debug("Error processing JSON response: " + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         if 'results' not in data:
@@ -123,14 +121,13 @@ class sfp_opencorporates(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except Exception as e:
-            self.sf.debug("Error processing JSON response: " + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         if 'results' not in data:
             return None
 
         return data['results']
-
 
     # Extract company address, previous names, and officer names
     def extractCompanyDetails(self, company, sevt):

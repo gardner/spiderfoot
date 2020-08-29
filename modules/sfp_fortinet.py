@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_fortinet(SpiderFootPlugin):
-    """Fortiguard.com:Investigate,Passive:Reputation Systems::Check if an IP is malicious according to Fortiguard.com."""
 
     meta = {
         'name': "Fortiguard.com",
@@ -81,13 +80,11 @@ class sfp_fortinet(SpiderFootPlugin):
     def watchedEvents(self):
         return ["IP_ADDRESS", "AFFILIATE_IPADDR"]
 
-
     # What events this module produces
     # This is to support the end user in selecting modules based on events
     # produced.
     def producedEvents(self):
         return ["MALICIOUS_IPADDR", "MALICIOUS_AFFILIATE_IPADDR"]
-
 
     # Check the regexps to see whether the content indicates maliciousness
     def contentMalicious(self, content, goodregex, badregex):
@@ -188,7 +185,7 @@ class sfp_fortinet(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

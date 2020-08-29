@@ -36,7 +36,6 @@ malchecks = {
 }
 
 class sfp_abusech(SpiderFootPlugin):
-    """abuse.ch:Investigate,Passive:Reputation Systems::Check if a host/domain, IP or netblock is malicious according to abuse.ch."""
 
     meta = {
         'name': "abuse.ch",
@@ -280,7 +279,7 @@ class sfp_abusech(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 

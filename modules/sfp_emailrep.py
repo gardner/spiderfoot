@@ -15,7 +15,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_emailrep(SpiderFootPlugin):
-    """EmailRep:Footprint,Investigate,Passive:Search Engines:apikey:Search EmailRep.io for email address reputation."""
 
     meta = {
         'name': "EmailRep",
@@ -114,7 +113,7 @@ class sfp_emailrep(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug("Error processing JSON response: " + str(e))
+            self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
         return data

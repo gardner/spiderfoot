@@ -15,7 +15,6 @@ import time
 from sflib import SpiderFootPlugin, SpiderFootEvent
 
 class sfp_fsecure_riddler(SpiderFootPlugin):
-    """F-Secure Riddler.io:Investigate,Footprint,Passive:Search Engines:apikey:Obtain network information from F-Secure Riddler.io API."""
 
     meta = {
         'name': "F-Secure Riddler.io",
@@ -101,7 +100,7 @@ class sfp_fsecure_riddler(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug("Error processing JSON response from F-Secure Riddler: " + str(e))
+            self.sf.debug(f"Error processing JSON response from F-Secure Riddler: {e}")
             return None
 
         try:
@@ -130,7 +129,6 @@ class sfp_fsecure_riddler(SpiderFootPlugin):
             'Content-Type': 'application/json',
         }
 
-
         res = self.sf.fetchUrl('https://riddler.io/api/search',
                                postData=json.dumps(params),
                                headers=headers,
@@ -150,7 +148,7 @@ class sfp_fsecure_riddler(SpiderFootPlugin):
         try:
             data = json.loads(res['content'])
         except BaseException as e:
-            self.sf.debug("Error processing JSON response from F-Secure Riddler: " + str(e))
+            self.sf.debug(f"Error processing JSON response from F-Secure Riddler: {e}")
             return None
 
         if not data:
@@ -236,7 +234,7 @@ class sfp_fsecure_riddler(SpiderFootPlugin):
                 evt_type = 'AFFILIATE_INTERNET_NAME'
 
             if self.opts['verify'] and not self.sf.resolveHost(host):
-                self.sf.debug("Host " + host + " could not be resolved")
+                self.sf.debug(f"Host {host} could not be resolved")
                 evt_type += '_UNRESOLVED'
 
             evt = SpiderFootEvent(evt_type, host, self.__name__, event)

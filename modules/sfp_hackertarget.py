@@ -20,7 +20,6 @@ from sflib import SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_hackertarget(SpiderFootPlugin):
-    """HackerTarget:Footprint,Investigate,Passive:Passive DNS::Search HackerTarget.com for hosts sharing the same IP."""
 
     meta = {
         'name': "HackerTarget",
@@ -262,7 +261,6 @@ class sfp_hackertarget(SpiderFootPlugin):
                     else:
                         hosts.append(strdata)
 
-
                 for host in set(hosts):
                     if self.getTarget().matches(host, includeChildren=True, includeParents=True):
                         evt_type = 'INTERNET_NAME'
@@ -270,7 +268,7 @@ class sfp_hackertarget(SpiderFootPlugin):
                         evt_type = 'AFFILIATE_INTERNET_NAME'
 
                     if self.opts['verify'] and not self.sf.resolveHost(host):
-                        self.sf.debug("Host " + host + " could not be resolved")
+                        self.sf.debug(f"Host {host} could not be resolved")
                         evt_type += '_UNRESOLVED'
 
                     evt = SpiderFootEvent(evt_type, host, self.__name__, event)

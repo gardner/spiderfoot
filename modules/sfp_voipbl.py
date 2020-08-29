@@ -26,7 +26,6 @@ malchecks = {
 
 
 class sfp_voipbl(SpiderFootPlugin):
-    """VoIPBL OpenPBX IPs:Investigate,Passive:Reputation Systems::Check if an IP or netblock is an open PBX according to VoIPBL OpenPBX IPs."""
 
     meta = {
         'name': "VoIPBL OpenPBX IPs",
@@ -242,7 +241,7 @@ class sfp_voipbl(SpiderFootPlugin):
 
             # Notify other modules of what you've found
             if url is not None:
-                text = check + " [" + eventData + "]\n" + "<SFURL>" + url + "</SFURL>"
+                text = f"{check} [{eventData}]\n<SFURL>{url}</SFURL>"
                 evt = SpiderFootEvent(evtType, text, self.__name__, event)
                 self.notifyListeners(evt)
 
