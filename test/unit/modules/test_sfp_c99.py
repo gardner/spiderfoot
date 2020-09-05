@@ -1,9 +1,9 @@
 # test_sfp_c99.py
-from sflib import SpiderFoot
-from spiderfoot import SpiderFootEvent
-from spiderfoot import SpiderFootTarget
 import unittest
+
 from modules.sfp_c99 import sfp_c99
+from sflib import SpiderFoot
+from spiderfoot import SpiderFootEvent, SpiderFootTarget
 
 
 class TestModuleC99(unittest.TestCase):
@@ -12,8 +12,6 @@ class TestModuleC99(unittest.TestCase):
         "_debug": False,  # Debug
         "__logging": True,  # Logging in general
         "__outputfilter": None,  # Event types to filter from modules' output
-        "__blocknotif": False,  # Block notifications
-        "_fatalerrors": False,
         "_useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",  # User-Agent to use for HTTP requests
         "_dnsserver": "",  # Override the default resolver
         "_fetchtimeout": 5,  # number of seconds before giving up on a fetch
@@ -31,7 +29,6 @@ class TestModuleC99(unittest.TestCase):
         "_socks3port": "",
         "_socks4user": "",
         "_socks5pwd": "",
-        "_socks6dns": True,
         "_torctlport": 9051,
         "__logstdout": False,
     }

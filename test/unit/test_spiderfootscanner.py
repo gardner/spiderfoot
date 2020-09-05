@@ -13,8 +13,6 @@ class TestSpiderFootScanner(unittest.TestCase):
         '_debug': False,
         '__logging': True,
         '__outputfilter': None,
-        '__blocknotif': False,
-        '_fatalerrors': False,
         '_useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',
         '_dnsserver': '',
         '_fetchtimeout': 5,
@@ -32,7 +30,6 @@ class TestSpiderFootScanner(unittest.TestCase):
         '_socks3port': '',
         '_socks4user': '',
         '_socks5pwd': '',
-        '_socks6dns': True,
         '_torctlport': 9051,
         '__logstdout': False
     }

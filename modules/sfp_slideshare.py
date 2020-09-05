@@ -34,8 +34,8 @@ class sfp_slideshare(SpiderFootPlugin):
             'favIcon': "https://public.slidesharecdn.com/favicon.ico?d8e2a4ed15",
             'logo': "https://public.slidesharecdn.com/images/logo/linkedin-ss/SS_Logo_White_Large.png?6d1f7a78a6",
             'description': "LinkedIn SlideShare is an American hosting service for professional content including "
-                                "presentations, infographics, documents, and videos. "
-                                "Users can upload files privately or publicly in PowerPoint, Word, PDF, or OpenDocument format.",
+            "presentations, infographics, documents, and videos. "
+            "Users can upload files privately or publicly in PowerPoint, Word, PDF, or OpenDocument format.",
         }
     }
 
@@ -84,7 +84,7 @@ class sfp_slideshare(SpiderFootPlugin):
             network = eventData.split(": ")[0]
             url = eventData.split(": ")[1].replace("<SFURL>", "").replace("</SFURL>", "")
         except BaseException as e:
-            self.sf.error("Unable to parse SOCIAL_MEDIA: {eventData} ({e})", False)
+            self.sf.error(f"Unable to parse SOCIAL_MEDIA: {eventData} ({e})", False)
             return None
 
         if not network == "SlideShare":

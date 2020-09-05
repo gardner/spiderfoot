@@ -16,8 +16,6 @@ class TestSpiderFootWebUiRoutes(helper.CPWebCase):
             '_debug': False,  # Debug
             '__logging': True,  # Logging in general
             '__outputfilter': None,  # Event types to filter from modules' output
-            '__blocknotif': False,  # Block notifications
-            '_fatalerrors': False,
             '_useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',  # User-Agent to use for HTTP requests
             '_dnsserver': '',  # Override the default resolver
             '_fetchtimeout': 5,  # number of seconds before giving up on a fetch
@@ -35,7 +33,6 @@ class TestSpiderFootWebUiRoutes(helper.CPWebCase):
             '_socks3port': '',
             '_socks4user': '',
             '_socks5pwd': '',
-            '_socks6dns': True,
             '_torctlport': 9051,
             '__logstdout': False
         }
@@ -307,8 +304,6 @@ class TestSpiderFootWebUi(unittest.TestCase):
         '_debug': False,
         '__logging': True,
         '__outputfilter': None,
-        '__blocknotif': False,
-        '_fatalerrors': False,
         '_useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',
         '_dnsserver': '',
         '_fetchtimeout': 5,
@@ -326,7 +321,6 @@ class TestSpiderFootWebUi(unittest.TestCase):
         '_socks3port': '',
         '_socks4user': '',
         '_socks5pwd': '',
-        '_socks6dns': True,
         '_torctlport': 9051,
         '__logstdout': False
     }

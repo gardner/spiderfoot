@@ -41,9 +41,9 @@ class sfp_pastebin(SpiderFootPlugin):
             'favIcon': "https://pastebin.com/favicon.ico",
             'logo': "https://pastebin.com/favicon.ico",
             'description': "Pastebin is a website where you can store any text online for easy sharing. "
-                                "The website is mainly used by programmers to store pieces of source code or "
-                                "configuration information, but anyone is more than welcome to paste any type of text. "
-                                "The idea behind the site is to make it more convenient for people to share large amounts of text online.",
+            "The website is mainly used by programmers to store pieces of source code or "
+            "configuration information, but anyone is more than welcome to paste any type of text. "
+            "The idea behind the site is to make it more convenient for people to share large amounts of text online.",
         }
     }
 
@@ -144,14 +144,15 @@ class sfp_pastebin(SpiderFootPlugin):
                     continue
 
                 # Sometimes pastes search results false positives
-                if re.search(r"[^a-zA-Z\-\_0-9]" + re.escape(eventData)
-                             + r"[^a-zA-Z\-\_0-9]", res['content'], re.IGNORECASE) is None:
+                if eventData.lower() not in str(res['content']).lower():
+                    self.sf.debug("String not found in pastes content.")
                     continue
 
-                try:
-                    startIndex = res['content'].index(eventData)
-                except BaseException:
-                    self.sf.debug("String not found in pastes content.")
+                if re.search(
+                    r"[^a-zA-Z\-\_0-9]" + re.escape(eventData) + r"[^a-zA-Z\-\_0-9]",
+                    res['content'],
+                    re.IGNORECASE
+                ) is None:
                     continue
 
                 evt1 = SpiderFootEvent("LEAKSITE_URL", link, self.__name__, event)

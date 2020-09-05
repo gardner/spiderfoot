@@ -15,8 +15,6 @@ class TestModulespamhaus(unittest.TestCase):
         '_debug': False,  # Debug
         '__logging': True,  # Logging in general
         '__outputfilter': None,  # Event types to filter from modules' output
-        '__blocknotif': False,  # Block notifications
-        '_fatalerrors': False,
         '_useragent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',  # User-Agent to use for HTTP requests
         '_dnsserver': '',  # Override the default resolver
         '_fetchtimeout': 5,  # number of seconds before giving up on a fetch
@@ -34,7 +32,6 @@ class TestModulespamhaus(unittest.TestCase):
         '_socks3port': '',
         '_socks4user': '',
         '_socks5pwd': '',
-        '_socks6dns': True,
         '_torctlport': 9051,
         '__logstdout': False
     }
@@ -69,13 +66,13 @@ class TestModulespamhaus(unittest.TestCase):
         module = sfp_spamhaus()
         module.setup(sf, dict())
 
-        target_value = 'example target value'
+        target_value = '1.1.1.1'
         target_type = 'IP_ADDRESS'
         target = SpiderFootTarget(target_value, target_type)
         module.setTarget(target)
 
         event_type = 'ROOT'
-        event_data = 'example data'
+        event_data = '1.1.1.1'
         event_module = ''
         source_event = ''
         evt = SpiderFootEvent(event_type, event_data, event_module, source_event)

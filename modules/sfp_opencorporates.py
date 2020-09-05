@@ -34,9 +34,9 @@ class sfp_opencorporates(SpiderFootPlugin):
             'favIcon': "https://opencorporates.com/assets/favicons/favicon.png",
             'logo': "https://opencorporates.com/contents/ui/theme/img/oc-logo.svg",
             'description': "The largest open database of companies in the world.\n"
-                                "As the largest, open database of companies in the world, "
-                                "our business is making high-quality, official company data openly available. "
-                                "Data that can be trusted, accessed, analysed and interrogated when and how it’s needed.",
+            "As the largest, open database of companies in the world, "
+            "our business is making high-quality, official company data openly available. "
+            "Data that can be trusted, accessed, analysed and interrogated when and how it’s needed.",
         }
     }
 
@@ -89,7 +89,7 @@ class sfp_opencorporates(SpiderFootPlugin):
         })
 
         res = self.sf.fetchUrl(
-            "https://api.opencorporates.com/v{version}/companies/search?{params}{apiparam}",
+            f"https://api.opencorporates.com/v{version}/companies/search?{params}{apiparam}",
             timeout=60,  # High timeouts as they can sometimes take a while
             useragent=self.opts['_useragent']
         )
