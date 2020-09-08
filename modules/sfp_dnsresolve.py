@@ -239,14 +239,14 @@ class sfp_dnsresolve(SpiderFootPlugin):
                 if addrs:
                     self.sf.debug(f"Found a reversed hostname from {ipaddr} ({addrs})")
                     # TODO: review why addr is not used in this loop. should `ipaddr` instead be `addr` ?
-                    for _addr in addrs:
+                    for addr in addrs:
                         # Generate an event for the IP, then
                         # let the handling by this module take
                         # care of follow-up processing.
                         if self.checkForStop():
                             return None
 
-                        self.processHost(ipaddr, parentEvent, False)
+                        self.processHost(addr, parentEvent, False)
             return None
 
         if eventName in ["IP_ADDRESS", "INTERNET_NAME", "IPV6_ADDRESS",
@@ -332,9 +332,6 @@ class sfp_dnsresolve(SpiderFootPlugin):
                 return None
 
         # Report the host
-        # Commented this out since CNAMEs weren't being reported.
-        # TODO: review CNAME handling
-        # if host != parentEvent.data and htype != parentEvent.eventType:
         if host != parentEvent.data:
             evt = SpiderFootEvent(htype, host, self.__name__, parentEvent)
             self.notifyListeners(evt)
