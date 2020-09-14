@@ -86,7 +86,7 @@ class sfp_onioncity(SpiderFootPlugin):
         self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         if self.opts['api_key'] == "":
-            self.sf.error("You enabled sfp_onioncity but did not set a Google API key!", False)
+            self.sf.error("You enabled sfp_onioncity but did not set a Google API key!")
             self.errorState = True
             return None
 
@@ -164,7 +164,7 @@ class sfp_onioncity(SpiderFootPlugin):
                 try:
                     startIndex = res['content'].index(eventData) - 120
                     endIndex = startIndex + len(eventData) + 240
-                except BaseException:
+                except Exception:
                     self.sf.debug("String not found in content.")
                     continue
 

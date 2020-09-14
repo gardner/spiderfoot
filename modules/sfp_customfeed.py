@@ -155,7 +155,7 @@ class sfp_customfeed(SpiderFootPlugin):
                                     re.match(rxTgt, line, re.IGNORECASE):
                                 self.sf.debug(target + "/" + targetDom + " found in " + check + " list.")
                                 return url
-                    except BaseException as e:
+                    except Exception as e:
                         self.sf.debug("Error encountered parsing 2: " + str(e))
                         continue
 
@@ -183,7 +183,7 @@ class sfp_customfeed(SpiderFootPlugin):
             return None
 
         if self.opts['url'] == "":
-            self.sf.error("You enabled sfp_customfeed but defined no custom feed URL!", False)
+            self.sf.error("You enabled sfp_customfeed but defined no custom feed URL!")
             self.errorState = True
             return None
 

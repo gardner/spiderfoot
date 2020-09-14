@@ -114,7 +114,7 @@ class sfp_emailrep(SpiderFootPlugin):
 
         try:
             data = json.loads(res['content'])
-        except BaseException as e:
+        except Exception as e:
             self.sf.debug(f"Error processing JSON response: {e}")
             return None
 
@@ -133,7 +133,7 @@ class sfp_emailrep(SpiderFootPlugin):
         self.sf.debug(f"Received event, {eventName}, from {srcModuleName}")
 
         if self.opts['api_key'] == '':
-            self.sf.error("Warning: You enabled sfp_emailrep but did not set an API key! Queries will be rate limited.", False)
+            self.sf.error("Warning: You enabled sfp_emailrep but did not set an API key! Queries will be rate limited.")
 
         res = self.query(eventData)
 
